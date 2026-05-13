@@ -13,6 +13,7 @@ public class TrainerDbContext : DbContext
         _tenant = tenant;
     }
 
+    public DbSet<User> Users => Set<User>();
     public DbSet<Client> Clients => Set<Client>();
     public DbSet<Exercise> Exercises => Set<Exercise>();
     public DbSet<WorkoutTemplate> WorkoutTemplates => Set<WorkoutTemplate>();
@@ -22,6 +23,17 @@ public class TrainerDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder b)
     {
+        b.Entity<User>(e =>
+        {
+            e.Property(x => x.Email).IsRequired().HasMaxLength(256);
+            e.Property(x => x.PasswordHash).IsRequired();
+            e.Property(x => x.DisplayName).HasMaxLength(200);
+            e.HasIndex(x => x.Email).IsUnique();
+            // NB: НЕТ HasQueryFilter — логин должен находить пользователя по email до того,
+            // как мы узнаем его TenantId. Безопасность login-endpoint обеспечивается тем,
+            // что он публичный по дизайну и проверяет пароль.
+        });
+
         b.Entity<Client>(e =>
         {
             e.Property(x => x.Name).IsRequired().HasMaxLength(200);

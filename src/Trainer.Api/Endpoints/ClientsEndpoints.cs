@@ -7,7 +7,7 @@ public static class ClientsEndpoints
 {
     public static IEndpointRouteBuilder MapClientsEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/clients").WithTags("Clients");
+        var group = app.MapGroup("/api/clients").WithTags("Clients").RequireAuthorization();
 
         group.MapGet("/", async (IClientService clients, CancellationToken ct) =>
         {
