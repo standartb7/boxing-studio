@@ -5,6 +5,10 @@
              x:Class="Trainer.App.Pages.ClientsPage"
              Title="Клиенты">
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Выйти" Clicked="OnLogoutClicked" />
+    </ContentPage.ToolbarItems>
+
     <Grid RowDefinitions="*,Auto" Padding="12">
 
         <CollectionView x:Name="ClientsList"
