@@ -6,7 +6,7 @@
 ._*
 
 # Custom folder icons
-Icon
+Icon
 
 # Volume root files
 .DocumentRevisions-V100
@@ -94,3 +94,11 @@ DerivedData/
 # Playgrounds
 timeline.xctimeline
 playground.xcworkspace
+
+### Secrets (safety net — user-secrets уже хранятся вне репо, в ~/.microsoft/usersecrets)
+appsettings.Local.json
+appsettings.Production.json
+appsettings.*.user.json
+*.secrets.json
+.env
+.env.local

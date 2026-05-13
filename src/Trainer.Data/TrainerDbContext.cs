@@ -1,11 +1,17 @@
 using Microsoft.EntityFrameworkCore;
+using Trainer.Core.Abstractions;
 using Trainer.Core.Entities;
 
 namespace Trainer.Data;
 
 public class TrainerDbContext : DbContext
 {
-    public TrainerDbContext(DbContextOptions<TrainerDbContext> options) : base(options) { }
+    private readonly ITenantContext _tenant;
+
+    public TrainerDbContext(DbContextOptions<TrainerDbContext> options, ITenantContext tenant) : base(options)
+    {
+        _tenant = tenant;
+    }
 
     public DbSet<Client> Clients => Set<Client>();
     public DbSet<Exercise> Exercises => Set<Exercise>();
@@ -20,17 +26,23 @@ public class TrainerDbContext : DbContext
         {
             e.Property(x => x.Name).IsRequired().HasMaxLength(200);
             e.HasIndex(x => x.IsActive);
+            e.HasIndex(x => x.TenantId);
+            e.HasQueryFilter(x => x.TenantId == _tenant.CurrentTenantId);
         });
 
         b.Entity<Exercise>(e =>
         {
             e.Property(x => x.Name).IsRequired().HasMaxLength(200);
             e.HasIndex(x => x.Category);
+            e.HasIndex(x => x.TenantId);
+            e.HasQueryFilter(x => x.TenantId == _tenant.CurrentTenantId);
         });
 
         b.Entity<WorkoutTemplate>(e =>
         {
             e.Property(x => x.Name).IsRequired().HasMaxLength(200);
+            e.HasIndex(x => x.TenantId);
+            e.HasQueryFilter(x => x.TenantId == _tenant.CurrentTenantId);
             e.HasMany(x => x.Items)
                 .WithOne(x => x.Template)
                 .HasForeignKey(x => x.TemplateId)
@@ -39,6 +51,8 @@ public class TrainerDbContext : DbContext
 
         b.Entity<TemplateItem>(e =>
         {
+            e.HasIndex(x => x.TenantId);
+            e.HasQueryFilter(x => x.TenantId == _tenant.CurrentTenantId);
             e.HasOne(x => x.Exercise)
                 .WithMany()
                 .HasForeignKey(x => x.ExerciseId)
@@ -47,6 +61,10 @@ public class TrainerDbContext : DbContext
 
         b.Entity<ScheduledWorkout>(e =>
         {
+            e.HasIndex(x => x.TenantId);
+            e.HasIndex(x => x.StartAt);
+            e.HasQueryFilter(x => x.TenantId == _tenant.CurrentTenantId);
+
             e.HasOne(x => x.Client)
                 .WithMany(x => x.Workouts)
                 .HasForeignKey(x => x.ClientId)
@@ -61,12 +79,12 @@ public class TrainerDbContext : DbContext
                 .WithOne(x => x.ScheduledWorkout)
                 .HasForeignKey(x => x.ScheduledWorkoutId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            e.HasIndex(x => x.StartAt);
         });
 
         b.Entity<WorkoutItem>(e =>
         {
+            e.HasIndex(x => x.TenantId);
+            e.HasQueryFilter(x => x.TenantId == _tenant.CurrentTenantId);
             e.HasOne(x => x.Exercise)
                 .WithMany()
                 .HasForeignKey(x => x.ExerciseId)
@@ -78,29 +96,35 @@ public class TrainerDbContext : DbContext
 
     public override int SaveChanges()
     {
-        TouchTimestamps();
+        StampEntities();
         return base.SaveChanges();
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken ct = default)
     {
-        TouchTimestamps();
+        StampEntities();
         return base.SaveChangesAsync(ct);
     }
 
-    private void TouchTimestamps()
+    private void StampEntities()
     {
         var now = DateTimeOffset.UtcNow;
+        var tenantId = _tenant.CurrentTenantId;
+
         foreach (var entry in ChangeTracker.Entries<EntityBase>())
         {
             if (entry.State == EntityState.Added)
             {
                 entry.Entity.CreatedAt = now;
                 entry.Entity.UpdatedAt = now;
+                if (entry.Entity.TenantId == Guid.Empty)
+                    entry.Entity.TenantId = tenantId;
             }
             else if (entry.State == EntityState.Modified)
             {
                 entry.Entity.UpdatedAt = now;
+                // защита от подмены TenantId: запрещаем менять его на UPDATE
+                entry.Property(nameof(EntityBase.TenantId)).IsModified = false;
             }
         }
     }
