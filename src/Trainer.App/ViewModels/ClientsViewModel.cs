@@ -14,24 +14,17 @@ public class ClientsViewModel
         Items = new ObservableCollection<Client>();
     }
 
-    public TrainingType? Filter { get; set; }
+    public Guid? FilterTypeId { get; set; }
 
     public ObservableCollection<Client> Items { get; }
 
     public async Task LoadAsync(CancellationToken ct = default)
     {
-        var data = Filter is null
+        var data = FilterTypeId is null
             ? await _clients.GetAllAsync(ct)
-            : await _clients.GetByTypeAsync(Filter.Value, ct);
+            : await _clients.GetByTypeAsync(FilterTypeId.Value, ct);
 
         Items.Clear();
         foreach (var c in data) Items.Add(c);
-    }
-
-    public async Task DeleteAsync(Guid id, CancellationToken ct = default)
-    {
-        await _clients.DeleteAsync(id, ct);
-        var existing = Items.FirstOrDefault(c => c.Id == id);
-        if (existing is not null) Items.Remove(existing);
     }
 }

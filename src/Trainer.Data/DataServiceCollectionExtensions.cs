@@ -13,6 +13,7 @@ public static class DataServiceCollectionExtensions
             opt.UseSqlite($"Data Source={dbPath}"));
 
         services.AddScoped<IClientService, ClientService>();
+        services.AddScoped<ITrainingTypeService, TrainingTypeService>();
 
         return services;
     }

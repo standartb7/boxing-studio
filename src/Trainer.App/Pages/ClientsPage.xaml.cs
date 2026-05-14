@@ -16,14 +16,10 @@ public partial class ClientsPage : ContentPage
         ClientsList.ItemsSource = _vm.Items;
     }
 
-    public TrainingType? Filter
+    public void SetFilter(Guid trainingTypeId, string typeName)
     {
-        get => _vm.Filter;
-        set
-        {
-            _vm.Filter = value;
-            Title = value is null ? "Клиенты" : value.Value.DisplayName();
-        }
+        _vm.FilterTypeId = trainingTypeId;
+        Title = typeName;
     }
 
     protected override async void OnAppearing()
@@ -42,7 +38,7 @@ public partial class ClientsPage : ContentPage
     private async void OnAddClicked(object sender, EventArgs e)
     {
         var editor = _services.GetRequiredService<ClientEditPage>();
-        editor.SetClient(null, _vm.Filter);
+        editor.SetClient(null, _vm.FilterTypeId);
         await Navigation.PushAsync(editor);
     }
 
@@ -52,7 +48,7 @@ public partial class ClientsPage : ContentPage
         ClientsList.SelectedItem = null;
 
         var editor = _services.GetRequiredService<ClientEditPage>();
-        editor.SetClient(client, _vm.Filter);
+        editor.SetClient(client, _vm.FilterTypeId);
         await Navigation.PushAsync(editor);
     }
 }

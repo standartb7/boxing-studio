@@ -6,29 +6,45 @@ namespace Trainer.App.Pages;
 public partial class ClientEditPage : ContentPage
 {
     private readonly IClientService _clients;
+    private readonly ITrainingTypeService _types;
+
     private Client? _editing;
+    private List<TrainingType> _availableTypes = new();
 
-    // Чекбоксы для дней недели — заполняются динамически.
-    private readonly Dictionary<WorkoutDays, CheckBox> _dayCheckboxes = new();
+    // Слоты в форме хранятся отдельно от Entity, обмен только на Save.
+    private readonly List<SlotRow> _slots = new();
 
-    public ClientEditPage(IClientService clients)
+    public ClientEditPage(IClientService clients, ITrainingTypeService types)
     {
         InitializeComponent();
         _clients = clients;
-
-        BuildTypePicker();
-        BuildDayCheckboxes();
+        _types = types;
     }
 
-    /// <summary>
-    /// Передаётся клиент для редактирования (null = создание).
-    /// defaultType — если создаём из конкретной группы, чтобы Picker сразу был на ней.
-    /// </summary>
-    public void SetClient(Client? client, TrainingType? defaultType)
+    public void SetClient(Client? client, Guid? defaultTypeId)
     {
         _editing = client;
+        _pendingDefaultTypeId = defaultTypeId;
+    }
 
-        if (client is null)
+    private Guid? _pendingDefaultTypeId;
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        try
+        {
+            _availableTypes = (await _types.GetAllAsync()).ToList();
+            TypePicker.ItemsSource = _availableTypes;
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Ошибка", ex.Message, "OK");
+            return;
+        }
+
+        if (_editing is null)
         {
             Title = "Новый клиент";
             DeleteBtn.IsVisible = false;
@@ -36,59 +52,115 @@ public partial class ClientEditPage : ContentPage
             FirstNameEntry.Text = string.Empty;
             PhoneEntry.Text = string.Empty;
             NotesEditor.Text = string.Empty;
-            TypePicker.SelectedIndex = (int)(defaultType ?? TrainingType.Personal);
-            foreach (var (_, cb) in _dayCheckboxes) cb.IsChecked = false;
-            TimePickerControl.Time = new TimeSpan(19, 0, 0);
+
+            var defaultType = _availableTypes.FirstOrDefault(t => t.Id == _pendingDefaultTypeId)
+                ?? _availableTypes.FirstOrDefault();
+            TypePicker.SelectedItem = defaultType;
+
+            _slots.Clear();
+            RebuildSlotsPanel();
         }
         else
         {
-            Title = client.FullName;
+            Title = _editing.FullName;
             DeleteBtn.IsVisible = true;
-            LastNameEntry.Text = client.LastName;
-            FirstNameEntry.Text = client.FirstName;
-            PhoneEntry.Text = client.Phone;
-            NotesEditor.Text = client.Notes;
-            TypePicker.SelectedItem = client.TrainingType;
-            foreach (var (day, cb) in _dayCheckboxes)
-                cb.IsChecked = client.WorkoutDays.HasFlag(day);
-            TimePickerControl.Time = client.WorkoutTime is null
-                ? new TimeSpan(19, 0, 0)
-                : new TimeSpan(client.WorkoutTime.Value.Hour, client.WorkoutTime.Value.Minute, 0);
+            LastNameEntry.Text = _editing.LastName;
+            FirstNameEntry.Text = _editing.FirstName;
+            PhoneEntry.Text = _editing.Phone;
+            NotesEditor.Text = _editing.Notes;
+
+            TypePicker.SelectedItem = _availableTypes.FirstOrDefault(t => t.Id == _editing.TrainingTypeId);
+
+            _slots.Clear();
+            foreach (var s in _editing.Schedule.OrderBy(s => Client.DayOrder(s.Day)).ThenBy(s => s.Time))
+                _slots.Add(new SlotRow { Day = s.Day, Time = s.Time });
+            RebuildSlotsPanel();
         }
     }
 
-    private void BuildTypePicker()
+    private void OnAddSlotClicked(object sender, EventArgs e)
     {
-        TypePicker.ItemsSource = Enum.GetValues<TrainingType>().Cast<object>().ToList();
-        TypePicker.ItemDisplayBinding = new Binding(".", converter: new TrainingTypeDisplayConverter());
-        TypePicker.SelectedIndex = 0;
+        _slots.Add(new SlotRow { Day = DayOfWeek.Monday, Time = new TimeOnly(19, 0) });
+        RebuildSlotsPanel();
     }
 
-    private void BuildDayCheckboxes()
+    private void RebuildSlotsPanel()
     {
-        DaysPanel.Children.Clear();
-        _dayCheckboxes.Clear();
-        foreach (var (day, shortName) in WorkoutDaysExtensions.EnumerateAll())
+        SlotsPanel.Children.Clear();
+        if (_slots.Count == 0)
         {
-            var cb = new CheckBox();
-            var label = new Label { Text = shortName, VerticalOptions = LayoutOptions.Center };
-            var stack = new VerticalStackLayout
+            SlotsPanel.Children.Add(new Label
             {
-                Spacing = 2,
-                HorizontalOptions = LayoutOptions.Center,
-                Children = { cb, label }
-            };
-            _dayCheckboxes[day] = cb;
-            DaysPanel.Children.Add(stack);
+                Text = "Нет слотов. Нажми «+ День», чтобы добавить.",
+                FontSize = 13,
+                TextColor = Colors.Gray,
+            });
+            return;
+        }
+
+        for (int i = 0; i < _slots.Count; i++)
+        {
+            var slot = _slots[i];
+            SlotsPanel.Children.Add(BuildSlotRow(slot));
         }
     }
 
-    private WorkoutDays CollectDays()
+    private View BuildSlotRow(SlotRow slot)
     {
-        var result = WorkoutDays.None;
-        foreach (var (day, cb) in _dayCheckboxes)
-            if (cb.IsChecked) result |= day;
-        return result;
+        var dayPicker = new Picker
+        {
+            ItemsSource = Enum.GetValues<DayOfWeek>()
+                .OrderBy(Client.DayOrder)
+                .Cast<object>().ToList(),
+            SelectedItem = slot.Day,
+            HorizontalOptions = LayoutOptions.Fill,
+        };
+        dayPicker.ItemDisplayBinding = new Binding(".", converter: new DayDisplayConverter());
+        dayPicker.SelectedIndexChanged += (_, _) =>
+        {
+            if (dayPicker.SelectedItem is DayOfWeek d) slot.Day = d;
+        };
+
+        var timePicker = new TimePicker
+        {
+            Time = slot.Time.ToTimeSpan(),
+            Format = "HH:mm",
+            WidthRequest = 100,
+        };
+        timePicker.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(TimePicker.Time))
+                slot.Time = new TimeOnly(timePicker.Time.Hours, timePicker.Time.Minutes);
+        };
+
+        var removeBtn = new Button
+        {
+            Text = "✕",
+            FontSize = 16,
+            Padding = new Thickness(10, 4),
+            MinimumHeightRequest = 32,
+            BackgroundColor = Colors.Transparent,
+            TextColor = Colors.Red,
+            BorderWidth = 0,
+        };
+        removeBtn.Clicked += (_, _) =>
+        {
+            _slots.Remove(slot);
+            RebuildSlotsPanel();
+        };
+
+        return new Grid
+        {
+            ColumnDefinitions =
+            {
+                new ColumnDefinition(GridLength.Star),
+                new ColumnDefinition(GridLength.Auto),
+                new ColumnDefinition(GridLength.Auto),
+            },
+            ColumnSpacing = 8,
+            Children = { dayPicker, timePicker, removeBtn },
+        }
+        .WithGridChildren(dayPicker, 0, timePicker, 1, removeBtn, 2);
     }
 
     private async void OnSaveClicked(object sender, EventArgs e)
@@ -101,9 +173,11 @@ public partial class ClientEditPage : ContentPage
             await DisplayAlert("Ошибка", "Укажи имя или фамилию", "OK");
             return;
         }
-
-        var selectedType = TypePicker.SelectedItem is TrainingType t ? t : TrainingType.Personal;
-        var time = new TimeOnly(TimePickerControl.Time.Hours, TimePickerControl.Time.Minutes);
+        if (TypePicker.SelectedItem is not TrainingType type)
+        {
+            await DisplayAlert("Ошибка", "Выбери группу", "OK");
+            return;
+        }
 
         try
         {
@@ -115,9 +189,8 @@ public partial class ClientEditPage : ContentPage
                     FirstName = firstName,
                     Phone = PhoneEntry.Text?.Trim(),
                     Notes = NotesEditor.Text?.Trim(),
-                    TrainingType = selectedType,
-                    WorkoutDays = CollectDays(),
-                    WorkoutTime = time,
+                    TrainingTypeId = type.Id,
+                    Schedule = _slots.Select(s => new ScheduleSlot { Day = s.Day, Time = s.Time }).ToList(),
                 };
                 await _clients.CreateAsync(client);
             }
@@ -127,9 +200,8 @@ public partial class ClientEditPage : ContentPage
                 _editing.FirstName = firstName;
                 _editing.Phone = PhoneEntry.Text?.Trim();
                 _editing.Notes = NotesEditor.Text?.Trim();
-                _editing.TrainingType = selectedType;
-                _editing.WorkoutDays = CollectDays();
-                _editing.WorkoutTime = time;
+                _editing.TrainingTypeId = type.Id;
+                _editing.Schedule = _slots.Select(s => new ScheduleSlot { ClientId = _editing.Id, Day = s.Day, Time = s.Time }).ToList();
                 await _clients.UpdateAsync(_editing);
             }
 
@@ -158,11 +230,34 @@ public partial class ClientEditPage : ContentPage
         }
     }
 
-    private class TrainingTypeDisplayConverter : IValueConverter
+    private class SlotRow
+    {
+        public DayOfWeek Day { get; set; }
+        public TimeOnly Time { get; set; }
+    }
+
+    private class DayDisplayConverter : IValueConverter
     {
         public object? Convert(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture)
-            => value is TrainingType t ? t.DisplayName() : string.Empty;
+            => value is DayOfWeek d ? Client.ShortDay(d) : string.Empty;
         public object? ConvertBack(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture)
             => throw new NotSupportedException();
+    }
+}
+
+file static class GridExtensions
+{
+    public static Grid WithGridChildren(this Grid grid, params object[] childrenWithColumns)
+    {
+        // pairs: (View, int col), (View, int col), ...
+        grid.Children.Clear();
+        for (int i = 0; i + 1 < childrenWithColumns.Length; i += 2)
+        {
+            var view = (View)childrenWithColumns[i];
+            var col = (int)childrenWithColumns[i + 1];
+            Grid.SetColumn(view, col);
+            grid.Children.Add(view);
+        }
+        return grid;
     }
 }

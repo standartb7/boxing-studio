@@ -12,29 +12,35 @@ public class ClientService : IClientService
 
     public async Task<IReadOnlyList<Client>> GetAllAsync(CancellationToken ct = default) =>
         await _db.Clients.AsNoTracking()
+            .Include(c => c.Schedule)
+            .Include(c => c.TrainingType)
             .Where(c => c.IsActive)
             .OrderBy(c => c.LastName).ThenBy(c => c.FirstName)
             .ToListAsync(ct);
 
-    public async Task<IReadOnlyList<Client>> GetByTypeAsync(TrainingType type, CancellationToken ct = default) =>
+    public async Task<IReadOnlyList<Client>> GetByTypeAsync(Guid trainingTypeId, CancellationToken ct = default) =>
         await _db.Clients.AsNoTracking()
-            .Where(c => c.IsActive && c.TrainingType == type)
+            .Include(c => c.Schedule)
+            .Where(c => c.IsActive && c.TrainingTypeId == trainingTypeId)
             .OrderBy(c => c.LastName).ThenBy(c => c.FirstName)
             .ToListAsync(ct);
 
-    public async Task<IReadOnlyDictionary<TrainingType, int>> GetCountsByTypeAsync(CancellationToken ct = default)
+    public async Task<IReadOnlyDictionary<Guid, int>> GetCountsByTypeAsync(CancellationToken ct = default)
     {
         var raw = await _db.Clients.AsNoTracking()
             .Where(c => c.IsActive)
-            .GroupBy(c => c.TrainingType)
-            .Select(g => new { Type = g.Key, Count = g.Count() })
+            .GroupBy(c => c.TrainingTypeId)
+            .Select(g => new { Id = g.Key, Count = g.Count() })
             .ToListAsync(ct);
 
-        return raw.ToDictionary(x => x.Type, x => x.Count);
+        return raw.ToDictionary(x => x.Id, x => x.Count);
     }
 
     public Task<Client?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
-        _db.Clients.FirstOrDefaultAsync(c => c.Id == id, ct);
+        _db.Clients
+            .Include(c => c.Schedule)
+            .Include(c => c.TrainingType)
+            .FirstOrDefaultAsync(c => c.Id == id, ct);
 
     public async Task<Client> CreateAsync(Client client, CancellationToken ct = default)
     {
@@ -45,6 +51,10 @@ public class ClientService : IClientService
 
     public async Task UpdateAsync(Client client, CancellationToken ct = default)
     {
+        // Schedule полностью заменяется: удаляем старое, сохраняем новое.
+        var existingSlots = _db.ScheduleSlots.Where(s => s.ClientId == client.Id);
+        _db.ScheduleSlots.RemoveRange(existingSlots);
+
         _db.Clients.Update(client);
         await _db.SaveChangesAsync(ct);
     }

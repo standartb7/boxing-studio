@@ -34,7 +34,28 @@ public partial class GroupsPage : ContentPage
         GroupsList.SelectedItem = null;
 
         var page = _services.GetRequiredService<ClientsPage>();
-        page.Filter = row.Type;
+        page.SetFilter(row.Type.Id, row.Type.Name);
         await Navigation.PushAsync(page);
+    }
+
+    private async void OnAddGroupClicked(object sender, EventArgs e)
+    {
+        var name = await DisplayPromptAsync(
+            "Новая группа",
+            "Название группы:",
+            accept: "Создать",
+            cancel: "Отмена",
+            placeholder: "Например: Утренние групповые");
+
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        try
+        {
+            await _vm.AddGroupAsync(name.Trim());
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Не удалось создать", ex.Message, "OK");
+        }
     }
 }

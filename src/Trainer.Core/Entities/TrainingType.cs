@@ -1,25 +1,13 @@
 namespace Trainer.Core.Entities;
 
 /// <summary>
-/// Тип тренировки, на которую ходит клиент. Используется как «группа» в UI.
-/// Тренер не может добавлять свои — изменения через релиз приложения.
+/// Тип тренировки — «группа» в UI. Тренер сам создаёт/именует.
+/// Уникальность по имени (case-insensitive) обеспечивается на уровне сервиса.
 /// </summary>
-public enum TrainingType
+public class TrainingType : EntityBase
 {
-    Personal = 0,    // персональные
-    Group = 1,       // групповые
-    Kids = 2,        // детские
-    Other = 99,      // прочее
-}
+    public string Name { get; set; } = string.Empty;
 
-public static class TrainingTypeExtensions
-{
-    public static string DisplayName(this TrainingType type) => type switch
-    {
-        TrainingType.Personal => "Персональные",
-        TrainingType.Group => "Групповые",
-        TrainingType.Kids => "Детские",
-        TrainingType.Other => "Другое",
-        _ => type.ToString(),
-    };
+    /// <summary>Порядок отображения в списке. Меньше — выше.</summary>
+    public int SortOrder { get; set; }
 }

@@ -17,15 +17,25 @@
             <Entry x:Name="PhoneEntry" Keyboard="Telephone" Placeholder="+7 999 000 0000" />
 
             <Label Text="Группа" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
-            <Picker x:Name="TypePicker" />
+            <Picker x:Name="TypePicker" ItemDisplayBinding="{Binding Name}" />
 
-            <Label Text="Дни недели" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
-            <HorizontalStackLayout x:Name="DaysPanel" Spacing="6" />
+            <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+                <Label Grid.Column="0"
+                       Text="Расписание"
+                       FontSize="13"
+                       VerticalOptions="Center"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+                <Button Grid.Column="1"
+                        Text="+ День"
+                        Clicked="OnAddSlotClicked"
+                        Style="{StaticResource OutlineButton}"
+                        Padding="10,4"
+                        FontSize="13"
+                        MinimumHeightRequest="32" />
+            </Grid>
+            <VerticalStackLayout x:Name="SlotsPanel" Spacing="6" />
 
-            <Label Text="Время" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
-            <TimePicker x:Name="TimePickerControl" Format="HH:mm" />
-
-            <Label Text="Заметки" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+            <Label Text="Заметки" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" Margin="0,8,0,0" />
             <Editor x:Name="NotesEditor" HeightRequest="80" />
 
             <Button Text="Сохранить"

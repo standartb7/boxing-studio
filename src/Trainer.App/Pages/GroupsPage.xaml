@@ -2,13 +2,25 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Trainer.App.ViewModels"
+             xmlns:entities="clr-namespace:Trainer.Core.Entities;assembly=Trainer.Core"
              x:Class="Trainer.App.Pages.GroupsPage"
              Title="Группы">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="+ Группа" Clicked="OnAddGroupClicked" />
+    </ContentPage.ToolbarItems>
 
     <CollectionView x:Name="GroupsList"
                     Margin="12"
                     SelectionMode="Single"
                     SelectionChanged="OnGroupSelected">
+        <CollectionView.EmptyView>
+            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="6">
+                <Label Text="Пока нет групп" FontSize="18" HorizontalTextAlignment="Center" />
+                <Label Text="Нажми «+ Группа», чтобы создать первую" TextColor="Gray" HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+        </CollectionView.EmptyView>
+
         <CollectionView.ItemTemplate>
             <DataTemplate x:DataType="vm:GroupRow">
                 <Border Padding="16"
@@ -21,7 +33,7 @@
                     </Border.StrokeShape>
                     <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
                         <Label Grid.Column="0"
-                               Text="{Binding Title}"
+                               Text="{Binding Type.Name}"
                                FontAttributes="Bold"
                                FontSize="17"
                                VerticalOptions="Center"
