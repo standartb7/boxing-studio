@@ -3,32 +3,27 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:entities="clr-namespace:Trainer.Core.Entities;assembly=Trainer.Core"
              x:Class="Trainer.App.Pages.SessionsPage"
-             Title="Сессии">
+             Title="Сессии"
+             NavigationPage.BackButtonTitle="Назад">
 
-    <Grid RowDefinitions="Auto,*,Auto" Padding="12">
+    <Grid RowDefinitions="Auto,*,Auto" Padding="12,16,12,12">
 
-        <Border Grid.Row="0"
-                Margin="0,0,0,8"
-                Padding="12,4"
-                StrokeThickness="1"
-                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
-                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="8" />
-            </Border.StrokeShape>
-            <Entry x:Name="SearchBox"
-                   Placeholder="Поиск по названию или участникам"
-                   TextChanged="OnSearchTextChanged"
-                   ClearButtonVisibility="WhileEditing"
-                   BackgroundColor="Transparent"
-                   TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}"
-                   PlaceholderColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
-        </Border>
+        <Entry x:Name="SearchBox"
+               Grid.Row="0"
+               Margin="0,0,0,8"
+               Placeholder="Поиск по названию или участникам"
+               TextChanged="OnSearchTextChanged"
+               ClearButtonVisibility="WhileEditing"
+               TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}"
+               PlaceholderColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
 
         <CollectionView x:Name="SessionsList"
                         Grid.Row="1"
                         SelectionMode="Single"
                         SelectionChanged="OnSessionSelected">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+            </CollectionView.ItemsLayout>
             <CollectionView.EmptyView>
                 <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="6">
                     <Label Text="Пока нет сессий" FontSize="18" HorizontalTextAlignment="Center" />

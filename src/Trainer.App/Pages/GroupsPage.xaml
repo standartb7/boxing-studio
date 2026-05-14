@@ -4,16 +4,20 @@
              xmlns:vm="clr-namespace:Trainer.App.ViewModels"
              xmlns:entities="clr-namespace:Trainer.Core.Entities;assembly=Trainer.Core"
              x:Class="Trainer.App.Pages.GroupsPage"
-             Title="Группы">
+             Title="Группы"
+             NavigationPage.BackButtonTitle="Назад">
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="+ Группа" Clicked="OnAddGroupClicked" />
     </ContentPage.ToolbarItems>
 
     <CollectionView x:Name="GroupsList"
-                    Margin="12"
+                    Margin="12,16,12,12"
                     SelectionMode="Single"
                     SelectionChanged="OnGroupSelected">
+        <CollectionView.ItemsLayout>
+            <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+        </CollectionView.ItemsLayout>
         <CollectionView.EmptyView>
             <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="6">
                 <Label Text="Пока нет групп" FontSize="18" HorizontalTextAlignment="Center" />

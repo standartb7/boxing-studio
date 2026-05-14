@@ -44,24 +44,14 @@
                     MinimumHeightRequest="32" />
         </Grid>
 
-        <!-- Search field: Entry в светлой обёртке, без нативного тёмного фона SearchBar -->
-        <Border Grid.Row="1"
-                Margin="12,0,12,8"
-                Padding="12,4"
-                StrokeThickness="1"
-                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
-                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="8" />
-            </Border.StrokeShape>
-            <Entry x:Name="SearchBox"
-                   Placeholder="Поиск по имени"
-                   TextChanged="OnSearchTextChanged"
-                   ClearButtonVisibility="WhileEditing"
-                   BackgroundColor="Transparent"
-                   TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}"
-                   PlaceholderColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
-        </Border>
+        <Entry x:Name="SearchBox"
+               Grid.Row="1"
+               Margin="12,0,12,8"
+               Placeholder="Поиск по имени"
+               TextChanged="OnSearchTextChanged"
+               ClearButtonVisibility="WhileEditing"
+               TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}"
+               PlaceholderColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
 
         <CollectionView x:Name="ClientsList"
                         Grid.Row="2"
