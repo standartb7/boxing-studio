@@ -36,6 +36,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<GroupsPage>();
 		builder.Services.AddTransient<SessionsPage>();
 		builder.Services.AddTransient<SessionEditPage>();
+		builder.Services.AddTransient<ClientPickerPage>();
 
 #if DEBUG
 		builder.Logging.AddDebug();

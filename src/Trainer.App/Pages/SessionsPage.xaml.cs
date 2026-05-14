@@ -35,6 +35,11 @@ public partial class SessionsPage : ContentPage
         }
     }
 
+    private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
+    {
+        _vm.SearchText = e.NewTextValue ?? string.Empty;
+    }
+
     private async void OnAddClicked(object sender, EventArgs e)
     {
         if (_vm.FilterTypeId is null) return;

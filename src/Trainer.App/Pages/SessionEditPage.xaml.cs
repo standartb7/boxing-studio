@@ -8,31 +8,41 @@ public partial class SessionEditPage : ContentPage
     private readonly ISessionService _sessions;
     private readonly ITrainingTypeService _types;
     private readonly IClientService _clients;
+    private readonly IServiceProvider _services;
 
     private Session? _editing;
     private Guid? _pendingDefaultTypeId;
+    private bool _initialized;
 
     private List<TrainingType> _availableTypes = new();
     private readonly List<SlotRow> _slots = new();
     private readonly List<Client> _members = new();
 
-    public SessionEditPage(ISessionService sessions, ITrainingTypeService types, IClientService clients)
+    public SessionEditPage(ISessionService sessions, ITrainingTypeService types, IClientService clients, IServiceProvider services)
     {
         InitializeComponent();
         _sessions = sessions;
         _types = types;
         _clients = clients;
+        _services = services;
     }
 
     public void SetSession(Session? session, Guid? defaultTypeId)
     {
         _editing = session;
         _pendingDefaultTypeId = defaultTypeId;
+        _initialized = false; // новая «сессия для редактирования» → нужно заново инициализировать
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+
+        // OnAppearing вызывается каждый раз когда страница появляется (включая возврат
+        // после закрытия модалки выбора участника). Инициализируем только при первом показе,
+        // иначе затрём слоты/участников, добавленные пользователем в форму.
+        if (_initialized) return;
+        _initialized = true;
 
         try
         {
@@ -173,34 +183,17 @@ public partial class SessionEditPage : ContentPage
 
     private async void OnAddMemberClicked(object sender, EventArgs e)
     {
-        const string CreateNew = "➕ Создать нового";
-
-        var allClients = await _clients.GetAllAsync();
-        var notYet = allClients
-            .Where(c => !_members.Any(m => m.Id == c.Id))
-            .ToList();
-
-        // Список действий: первая опция — всегда «Создать нового», потом существующие клиенты.
-        var options = new List<string> { CreateNew };
-        options.AddRange(notYet.Select(c => c.FullName));
-
-        var picked = await DisplayActionSheet("Добавить участника", "Отмена", null, options.ToArray());
-        if (string.IsNullOrEmpty(picked) || picked == "Отмена") return;
-
-        if (picked == CreateNew)
+        // Открываем модалку выбора с поиском. Создание нового — кнопка «+ Новый» в toolbar.
+        var picker = _services.GetRequiredService<ClientPickerPage>();
+        picker.SetExcluded(_members.Select(m => m.Id));
+        picker.Picked = client =>
         {
-            var created = await PromptCreateClientAsync();
-            if (created is null) return;
-            _members.Add(created);
-        }
-        else
-        {
-            var chosen = notYet.FirstOrDefault(c => c.FullName == picked);
-            if (chosen is null) return;
-            _members.Add(chosen);
-        }
+            _members.Add(client);
+            RebuildMembersPanel();
+        };
 
-        RebuildMembersPanel();
+        // Заворачиваем в NavigationPage чтобы кастомный header отображался корректно.
+        await Navigation.PushModalAsync(new NavigationPage(picker));
     }
 
     private async Task<Client?> PromptCreateClientAsync()

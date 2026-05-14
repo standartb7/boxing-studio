@@ -5,10 +5,28 @@
              x:Class="Trainer.App.Pages.SessionsPage"
              Title="Сессии">
 
-    <Grid RowDefinitions="*,Auto" Padding="12">
+    <Grid RowDefinitions="Auto,*,Auto" Padding="12">
+
+        <Border Grid.Row="0"
+                Margin="0,0,0,8"
+                Padding="12,4"
+                StrokeThickness="1"
+                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8" />
+            </Border.StrokeShape>
+            <Entry x:Name="SearchBox"
+                   Placeholder="Поиск по названию или участникам"
+                   TextChanged="OnSearchTextChanged"
+                   ClearButtonVisibility="WhileEditing"
+                   BackgroundColor="Transparent"
+                   TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}"
+                   PlaceholderColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+        </Border>
 
         <CollectionView x:Name="SessionsList"
-                        Grid.Row="0"
+                        Grid.Row="1"
                         SelectionMode="Single"
                         SelectionChanged="OnSessionSelected">
             <CollectionView.EmptyView>
@@ -65,7 +83,7 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <Button Grid.Row="1"
+        <Button Grid.Row="2"
                 Text="Добавить сессию"
                 Style="{StaticResource AccentButton}"
                 Clicked="OnAddClicked"
