@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Trainer.App.Pages.PinEntryPage"
+             Title="PIN"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}">
+
+    <Grid Padding="24" RowDefinitions="*,Auto,*">
+
+        <VerticalStackLayout Grid.Row="1" Spacing="20" HorizontalOptions="Center">
+
+            <Label Text="TRAINER"
+                   FontSize="32"
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+
+            <Label Text="Введи PIN-код"
+                   FontSize="14"
+                   HorizontalTextAlignment="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+
+            <Entry x:Name="PinEntry"
+                   Placeholder="••••"
+                   Keyboard="Numeric"
+                   MaxLength="4"
+                   IsPassword="True"
+                   HorizontalTextAlignment="Center"
+                   FontSize="24"
+                   WidthRequest="200"
+                   TextChanged="OnPinTextChanged" />
+
+            <Label x:Name="ErrorLabel"
+                   TextColor="Red"
+                   FontSize="13"
+                   HorizontalTextAlignment="Center"
+                   IsVisible="False" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

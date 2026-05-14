@@ -8,8 +8,8 @@
     Title="Trainer">
 
     <ShellContent
-        Title="Клиенты"
-        ContentTemplate="{DataTemplate pages:ClientsPage}"
-        Route="ClientsPage" />
+        Title="Группы"
+        ContentTemplate="{DataTemplate pages:GroupsPage}"
+        Route="GroupsPage" />
 
 </Shell>

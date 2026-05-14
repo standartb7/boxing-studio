@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Trainer.App.Pages.ClientEditPage"
+             Title="Клиент">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <Label Text="Фамилия" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+            <Entry x:Name="LastNameEntry" Placeholder="Иванов" />
+
+            <Label Text="Имя" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+            <Entry x:Name="FirstNameEntry" Placeholder="Иван" />
+
+            <Label Text="Телефон" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+            <Entry x:Name="PhoneEntry" Keyboard="Telephone" Placeholder="+7 999 000 0000" />
+
+            <Label Text="Группа" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+            <Picker x:Name="TypePicker" />
+
+            <Label Text="Дни недели" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+            <HorizontalStackLayout x:Name="DaysPanel" Spacing="6" />
+
+            <Label Text="Время" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+            <TimePicker x:Name="TimePickerControl" Format="HH:mm" />
+
+            <Label Text="Заметки" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+            <Editor x:Name="NotesEditor" HeightRequest="80" />
+
+            <Button Text="Сохранить"
+                    Style="{StaticResource AccentButton}"
+                    Clicked="OnSaveClicked"
+                    Margin="0,8,0,0" />
+
+            <Button x:Name="DeleteBtn"
+                    Text="Удалить"
+                    Style="{StaticResource OutlineButton}"
+                    Clicked="OnDeleteClicked"
+                    IsVisible="False" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -10,11 +10,28 @@ public class ClientService : IClientService
 
     public ClientService(TrainerDbContext db) => _db = db;
 
-    public async Task<IReadOnlyList<Client>> GetActiveAsync(CancellationToken ct = default) =>
+    public async Task<IReadOnlyList<Client>> GetAllAsync(CancellationToken ct = default) =>
         await _db.Clients.AsNoTracking()
             .Where(c => c.IsActive)
-            .OrderBy(c => c.Name)
+            .OrderBy(c => c.LastName).ThenBy(c => c.FirstName)
             .ToListAsync(ct);
+
+    public async Task<IReadOnlyList<Client>> GetByTypeAsync(TrainingType type, CancellationToken ct = default) =>
+        await _db.Clients.AsNoTracking()
+            .Where(c => c.IsActive && c.TrainingType == type)
+            .OrderBy(c => c.LastName).ThenBy(c => c.FirstName)
+            .ToListAsync(ct);
+
+    public async Task<IReadOnlyDictionary<TrainingType, int>> GetCountsByTypeAsync(CancellationToken ct = default)
+    {
+        var raw = await _db.Clients.AsNoTracking()
+            .Where(c => c.IsActive)
+            .GroupBy(c => c.TrainingType)
+            .Select(g => new { Type = g.Key, Count = g.Count() })
+            .ToListAsync(ct);
+
+        return raw.ToDictionary(x => x.Type, x => x.Count);
+    }
 
     public Task<Client?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
         _db.Clients.FirstOrDefaultAsync(c => c.Id == id, ct);
@@ -32,11 +49,11 @@ public class ClientService : IClientService
         await _db.SaveChangesAsync(ct);
     }
 
-    public async Task ArchiveAsync(Guid id, CancellationToken ct = default)
+    public async Task DeleteAsync(Guid id, CancellationToken ct = default)
     {
         var c = await _db.Clients.FindAsync(new object[] { id }, ct);
         if (c is null) return;
-        c.IsActive = false;
+        _db.Clients.Remove(c);
         await _db.SaveChangesAsync(ct);
     }
 }

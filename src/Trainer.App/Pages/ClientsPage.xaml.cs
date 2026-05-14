@@ -1,26 +1,29 @@
-using Trainer.App.Services.Auth;
 using Trainer.App.ViewModels;
+using Trainer.Core.Entities;
 
 namespace Trainer.App.Pages;
 
 public partial class ClientsPage : ContentPage
 {
     private readonly ClientsViewModel _vm;
-    private readonly IAuthService _auth;
+    private readonly IServiceProvider _services;
 
-    public ClientsPage(ClientsViewModel vm, IAuthService auth)
+    public ClientsPage(ClientsViewModel vm, IServiceProvider services)
     {
         InitializeComponent();
         _vm = vm;
-        _auth = auth;
+        _services = services;
         ClientsList.ItemsSource = _vm.Items;
     }
 
-    private async void OnLogoutClicked(object sender, EventArgs e)
+    public TrainingType? Filter
     {
-        var confirm = await DisplayAlert("Выход", "Выйти из аккаунта?", "Да", "Отмена");
-        if (!confirm) return;
-        await _auth.LogoutAsync();
+        get => _vm.Filter;
+        set
+        {
+            _vm.Filter = value;
+            Title = value is null ? "Клиенты" : value.Value.DisplayName();
+        }
     }
 
     protected override async void OnAppearing()
@@ -32,27 +35,24 @@ public partial class ClientsPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка загрузки", ex.Message, "OK");
+            await DisplayAlert("Ошибка", ex.Message, "OK");
         }
     }
 
     private async void OnAddClicked(object sender, EventArgs e)
     {
-        var name = await DisplayPromptAsync(
-            "Новый клиент",
-            "Имя клиента:",
-            accept: "Создать",
-            cancel: "Отмена",
-            placeholder: "Иван Петров");
+        var editor = _services.GetRequiredService<ClientEditPage>();
+        editor.SetClient(null, _vm.Filter);
+        await Navigation.PushAsync(editor);
+    }
 
-        if (string.IsNullOrWhiteSpace(name)) return;
-        try
-        {
-            await _vm.AddAsync(name.Trim());
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("Ошибка", ex.Message, "OK");
-        }
+    private async void OnClientSelected(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection.FirstOrDefault() is not Client client) return;
+        ClientsList.SelectedItem = null;
+
+        var editor = _services.GetRequiredService<ClientEditPage>();
+        editor.SetClient(client, _vm.Filter);
+        await Navigation.PushAsync(editor);
     }
 }

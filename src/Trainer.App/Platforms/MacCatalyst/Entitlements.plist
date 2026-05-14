@@ -6,13 +6,8 @@
         <!-- App Sandbox must be enabled to distribute a MacCatalyst app through the Mac App Store. -->
         <key>com.apple.security.app-sandbox</key>
         <true/>
-        <!-- When App Sandbox is enabled, this value is required to open outgoing network connections. -->
+        <!-- Сетевой клиент пока не нужен (локальная БД), но оставим — пригодится для импорта/экспорта. -->
         <key>com.apple.security.network.client</key>
         <true/>
-        <!-- Требуется для SecureStorage (Keychain). На подписанной сборке Keychain заработает. -->
-        <key>keychain-access-groups</key>
-        <array>
-            <string>$(AppIdentifierPrefix)com.companyname.trainer.app</string>
-        </array>
     </dict>
 </plist>

@@ -1,9 +1,9 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Trainer.App.Pages;
-using Trainer.App.Services.Api;
-using Trainer.App.Services.Auth;
+using Trainer.App.Services;
 using Trainer.App.ViewModels;
-using Trainer.Core.Abstractions;
+using Trainer.Data;
 
 namespace Trainer.App;
 
@@ -20,33 +20,37 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			});
 
-		// --- Auth state (singleton) ---
-		builder.Services.AddSingleton<AuthState>();
-		builder.Services.AddSingleton<IAuthService, AuthService>();
+		// --- Локальная БД (SQLite) ---
+		var dbPath = Path.Combine(FileSystem.AppDataDirectory, "trainer.db");
+		builder.Services.AddTrainerData(dbPath);
 
-		// --- HTTP clients ---
-		// "auth" — без bearer handler-а (запросы register/login до получения токена)
-		builder.Services.AddHttpClient("auth", c => c.BaseAddress = new Uri(ApiSettings.BaseUrl));
+		// --- Сервисы ---
+		builder.Services.AddSingleton<PinService>();
 
-		// "api" — с автоматической подстановкой Bearer-токена
-		builder.Services.AddTransient<BearerTokenHandler>();
-		builder.Services.AddHttpClient("api", c => c.BaseAddress = new Uri(ApiSettings.BaseUrl))
-			.AddHttpMessageHandler<BearerTokenHandler>();
-
-		// --- Доменные сервисы: HTTP-реализации интерфейсов из Trainer.Core ---
-		builder.Services.AddSingleton<IClientService, ApiClientService>();
-		// TODO: IExerciseService, IWorkoutTemplateService, IScheduleService — когда напишем endpoints
-
-		// --- Pages + ViewModels ---
-		builder.Services.AddTransient<LoginPage>();
-		builder.Services.AddTransient<RegisterPage>();
-		builder.Services.AddTransient<ClientsPage>();
+		// --- ViewModels ---
+		builder.Services.AddTransient<GroupsViewModel>();
 		builder.Services.AddTransient<ClientsViewModel>();
+
+		// --- Pages ---
+		builder.Services.AddTransient<PinSetupPage>();
+		builder.Services.AddTransient<PinEntryPage>();
+		builder.Services.AddTransient<GroupsPage>();
+		builder.Services.AddTransient<ClientsPage>();
+		builder.Services.AddTransient<ClientEditPage>();
 
 #if DEBUG
 		builder.Logging.AddDebug();
 #endif
 
-		return builder.Build();
+		var app = builder.Build();
+
+		// Создаём БД, если её нет.
+		using (var scope = app.Services.CreateScope())
+		{
+			var db = scope.ServiceProvider.GetRequiredService<TrainerDbContext>();
+			db.Database.EnsureCreated();
+		}
+
+		return app;
 	}
 }

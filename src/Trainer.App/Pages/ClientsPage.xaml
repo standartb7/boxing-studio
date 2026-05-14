@@ -5,15 +5,12 @@
              x:Class="Trainer.App.Pages.ClientsPage"
              Title="Клиенты">
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Выйти" Clicked="OnLogoutClicked" />
-    </ContentPage.ToolbarItems>
-
     <Grid RowDefinitions="*,Auto" Padding="12">
 
         <CollectionView x:Name="ClientsList"
                         Grid.Row="0"
-                        SelectionMode="None">
+                        SelectionMode="Single"
+                        SelectionChanged="OnClientSelected">
             <CollectionView.EmptyView>
                 <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="6">
                     <Label Text="Пока нет клиентов" FontSize="18" HorizontalTextAlignment="Center" />
@@ -31,14 +28,17 @@
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="8" />
                         </Border.StrokeShape>
-                        <VerticalStackLayout Spacing="2">
-                            <Label Text="{Binding Name}"
+                        <VerticalStackLayout Spacing="3">
+                            <Label Text="{Binding FullName}"
                                    FontAttributes="Bold"
                                    FontSize="16"
                                    TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
                             <Label Text="{Binding Phone}"
                                    FontSize="13"
                                    TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+                            <Label Text="{Binding ScheduleDisplay}"
+                                   FontSize="13"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
                         </VerticalStackLayout>
                     </Border>
                 </DataTemplate>
@@ -46,7 +46,6 @@
         </CollectionView>
 
         <Button Grid.Row="1"
-                x:Name="AddBtn"
                 Text="Добавить клиента"
                 Style="{StaticResource AccentButton}"
                 Clicked="OnAddClicked"
