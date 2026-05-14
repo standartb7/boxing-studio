@@ -9,6 +9,8 @@ public class TrainerDbContext : DbContext
 
     public DbSet<TrainingType> TrainingTypes => Set<TrainingType>();
     public DbSet<Client> Clients => Set<Client>();
+    public DbSet<Session> Sessions => Set<Session>();
+    public DbSet<SessionMember> SessionMembers => Set<SessionMember>();
     public DbSet<ScheduleSlot> ScheduleSlots => Set<ScheduleSlot>();
 
     protected override void OnModelCreating(ModelBuilder b)
@@ -16,34 +18,60 @@ public class TrainerDbContext : DbContext
         b.Entity<TrainingType>(e =>
         {
             e.Property(x => x.Name).IsRequired().HasMaxLength(100);
-            // case-insensitive уникальность через NOCASE collation (SQLite)
             e.Property(x => x.Name).UseCollation("NOCASE");
             e.HasIndex(x => x.Name).IsUnique();
         });
 
         b.Entity<Client>(e =>
         {
-            e.Property(x => x.FirstName).IsRequired().HasMaxLength(100);
-            e.Property(x => x.LastName).HasMaxLength(100);
+            e.Property(x => x.Name).IsRequired().HasMaxLength(200);
             e.Property(x => x.Phone).HasMaxLength(50);
             e.Property(x => x.Notes).HasMaxLength(2000);
             e.HasIndex(x => x.IsActive);
+        });
+
+        b.Entity<Session>(e =>
+        {
+            e.Property(x => x.Title).IsRequired().HasMaxLength(200);
+            e.Property(x => x.Notes).HasMaxLength(2000);
             e.HasIndex(x => x.TrainingTypeId);
+            e.HasIndex(x => x.IsActive);
 
             e.HasOne(x => x.TrainingType)
                 .WithMany()
                 .HasForeignKey(x => x.TrainingTypeId)
-                .OnDelete(DeleteBehavior.Restrict); // нельзя удалить тип с клиентами
+                .OnDelete(DeleteBehavior.Restrict); // нельзя удалить тип, у которого есть сессии
 
             e.HasMany(x => x.Schedule)
-                .WithOne(x => x.Client)
-                .HasForeignKey(x => x.ClientId)
-                .OnDelete(DeleteBehavior.Cascade); // удалили клиента — слоты ушли
+                .WithOne(x => x.Session)
+                .HasForeignKey(x => x.SessionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Many-to-many Session ↔ Client через явный SessionMember.
+            e.HasMany(x => x.Members)
+                .WithMany(c => c.Sessions)
+                .UsingEntity<SessionMember>(
+                    join => join
+                        .HasOne(sm => sm.Client)
+                        .WithMany()
+                        .HasForeignKey(sm => sm.ClientId)
+                        .OnDelete(DeleteBehavior.Cascade),
+                    join => join
+                        .HasOne(sm => sm.Session)
+                        .WithMany()
+                        .HasForeignKey(sm => sm.SessionId)
+                        .OnDelete(DeleteBehavior.Cascade),
+                    join =>
+                    {
+                        join.HasIndex(sm => sm.SessionId);
+                        join.HasIndex(sm => sm.ClientId);
+                        join.HasIndex(sm => new { sm.SessionId, sm.ClientId }).IsUnique();
+                    });
         });
 
         b.Entity<ScheduleSlot>(e =>
         {
-            e.HasIndex(x => x.ClientId);
+            e.HasIndex(x => x.SessionId);
         });
 
         base.OnModelCreating(b);

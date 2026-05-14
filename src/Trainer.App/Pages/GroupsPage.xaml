@@ -23,35 +23,44 @@
 
         <CollectionView.ItemTemplate>
             <DataTemplate x:DataType="vm:GroupRow">
-                <Border Padding="16"
-                        Margin="0,4"
-                        StrokeThickness="1"
-                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="8" />
-                    </Border.StrokeShape>
-                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
-                        <Label Grid.Column="0"
-                               Text="{Binding Type.Name}"
-                               FontAttributes="Bold"
-                               FontSize="17"
-                               VerticalOptions="Center"
-                               TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
-                        <Border Grid.Column="1"
-                                Padding="10,4"
-                                BackgroundColor="{StaticResource Accent}"
-                                StrokeThickness="0"
-                                VerticalOptions="Center">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="12" />
-                            </Border.StrokeShape>
-                            <Label Text="{Binding Count}"
+                <SwipeView Margin="0,4">
+                    <SwipeView.RightItems>
+                        <SwipeItems Mode="Reveal">
+                            <SwipeItem Text="Удалить"
+                                       BackgroundColor="#D33"
+                                       Invoked="OnDeleteGroupInvoked" />
+                        </SwipeItems>
+                    </SwipeView.RightItems>
+
+                    <Border Padding="16"
+                            StrokeThickness="1"
+                            Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                            <Label Grid.Column="0"
+                                   Text="{Binding Type.Name}"
                                    FontAttributes="Bold"
-                                   TextColor="{StaticResource Black}" />
-                        </Border>
-                    </Grid>
-                </Border>
+                                   FontSize="17"
+                                   VerticalOptions="Center"
+                                   TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+                            <Border Grid.Column="1"
+                                    Padding="10,4"
+                                    BackgroundColor="{StaticResource Accent}"
+                                    StrokeThickness="0"
+                                    VerticalOptions="Center">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12" />
+                                </Border.StrokeShape>
+                                <Label Text="{Binding Count}"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource Black}" />
+                            </Border>
+                        </Grid>
+                    </Border>
+                </SwipeView>
             </DataTemplate>
         </CollectionView.ItemTemplate>
     </CollectionView>

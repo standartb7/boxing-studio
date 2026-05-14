@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:entities="clr-namespace:Trainer.Core.Entities;assembly=Trainer.Core"
+             x:Class="Trainer.App.Pages.SessionsPage"
+             Title="Сессии">
+
+    <Grid RowDefinitions="*,Auto" Padding="12">
+
+        <CollectionView x:Name="SessionsList"
+                        Grid.Row="0"
+                        SelectionMode="Single"
+                        SelectionChanged="OnSessionSelected">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="6">
+                    <Label Text="Пока нет сессий" FontSize="18" HorizontalTextAlignment="Center" />
+                    <Label Text="Нажми «Добавить», чтобы создать первую" TextColor="Gray" HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="entities:Session">
+                    <SwipeView Margin="0,4">
+                        <SwipeView.RightItems>
+                            <SwipeItems Mode="Reveal">
+                                <SwipeItem Text="Удалить"
+                                           BackgroundColor="#D33"
+                                           Invoked="OnDeleteSessionInvoked" />
+                            </SwipeItems>
+                        </SwipeView.RightItems>
+
+                        <Border Padding="14"
+                                StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8" />
+                            </Border.StrokeShape>
+                            <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                                <VerticalStackLayout Grid.Column="0" Spacing="3">
+                                    <Label Text="{Binding DisplayTitle}"
+                                           FontAttributes="Bold"
+                                           FontSize="16"
+                                           TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+                                    <Label Text="{Binding ScheduleDisplay}"
+                                           FontSize="13"
+                                           TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+                                </VerticalStackLayout>
+                                <Border Grid.Column="1"
+                                        Padding="10,4"
+                                        BackgroundColor="{StaticResource Accent}"
+                                        StrokeThickness="0"
+                                        VerticalOptions="Center">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="12" />
+                                    </Border.StrokeShape>
+                                    <Label Text="{Binding Members.Count}"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource Black}" />
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </SwipeView>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Grid.Row="1"
+                Text="Добавить сессию"
+                Style="{StaticResource AccentButton}"
+                Clicked="OnAddClicked"
+                Margin="0,8,0,0" />
+    </Grid>
+
+</ContentPage>

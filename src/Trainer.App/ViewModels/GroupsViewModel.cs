@@ -9,12 +9,12 @@ public record GroupRow(TrainingType Type, int Count);
 public class GroupsViewModel
 {
     private readonly ITrainingTypeService _types;
-    private readonly IClientService _clients;
+    private readonly ISessionService _sessions;
 
-    public GroupsViewModel(ITrainingTypeService types, IClientService clients)
+    public GroupsViewModel(ITrainingTypeService types, ISessionService sessions)
     {
         _types = types;
-        _clients = clients;
+        _sessions = sessions;
         Items = new ObservableCollection<GroupRow>();
     }
 
@@ -23,7 +23,7 @@ public class GroupsViewModel
     public async Task LoadAsync(CancellationToken ct = default)
     {
         var types = await _types.GetAllAsync(ct);
-        var counts = await _clients.GetCountsByTypeAsync(ct);
+        var counts = await _sessions.GetCountsByTypeAsync(ct);
 
         Items.Clear();
         foreach (var t in types)
@@ -38,5 +38,12 @@ public class GroupsViewModel
         var created = await _types.CreateOrGetAsync(name, ct);
         await LoadAsync(ct);
         return created;
+    }
+
+    public async Task DeleteGroupAsync(Guid id, CancellationToken ct = default)
+    {
+        await _types.DeleteAsync(id, ct);
+        var row = Items.FirstOrDefault(r => r.Type.Id == id);
+        if (row is not null) Items.Remove(row);
     }
 }

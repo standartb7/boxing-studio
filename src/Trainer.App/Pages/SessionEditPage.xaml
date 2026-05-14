@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Trainer.App.Pages.ClientEditPage"
-             Title="Клиент">
+             x:Class="Trainer.App.Pages.SessionEditPage"
+             Title="Сессия">
 
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="12">
 
-            <Label Text="Фамилия" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
-            <Entry x:Name="LastNameEntry" Placeholder="Иванов" />
-
-            <Label Text="Имя" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
-            <Entry x:Name="FirstNameEntry" Placeholder="Иван" />
-
-            <Label Text="Телефон" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
-            <Entry x:Name="PhoneEntry" Keyboard="Telephone" Placeholder="+7 999 000 0000" />
+            <Label Text="Название" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+            <Entry x:Name="TitleEntry" Placeholder="Оставь пустым — будет имя участника" />
 
             <Label Text="Группа" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
             <Picker x:Name="TypePicker" ItemDisplayBinding="{Binding Name}" />
@@ -34,6 +28,22 @@
                         MinimumHeightRequest="32" />
             </Grid>
             <VerticalStackLayout x:Name="SlotsPanel" Spacing="6" />
+
+            <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+                <Label Grid.Column="0"
+                       Text="Участники"
+                       FontSize="13"
+                       VerticalOptions="Center"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+                <Button Grid.Column="1"
+                        Text="+ Участник"
+                        Clicked="OnAddMemberClicked"
+                        Style="{StaticResource OutlineButton}"
+                        Padding="10,4"
+                        FontSize="13"
+                        MinimumHeightRequest="32" />
+            </Grid>
+            <VerticalStackLayout x:Name="MembersPanel" Spacing="6" />
 
             <Label Text="Заметки" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" Margin="0,8,0,0" />
             <Editor x:Name="NotesEditor" HeightRequest="80" />

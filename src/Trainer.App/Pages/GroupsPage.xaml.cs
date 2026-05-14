@@ -33,7 +33,7 @@ public partial class GroupsPage : ContentPage
         if (e.CurrentSelection.FirstOrDefault() is not GroupRow row) return;
         GroupsList.SelectedItem = null;
 
-        var page = _services.GetRequiredService<ClientsPage>();
+        var page = _services.GetRequiredService<SessionsPage>();
         page.SetFilter(row.Type.Id, row.Type.Name);
         await Navigation.PushAsync(page);
     }
@@ -56,6 +56,27 @@ public partial class GroupsPage : ContentPage
         catch (Exception ex)
         {
             await DisplayAlert("Не удалось создать", ex.Message, "OK");
+        }
+    }
+
+    private async void OnDeleteGroupInvoked(object sender, EventArgs e)
+    {
+        if (sender is not SwipeItem swipe || swipe.BindingContext is not GroupRow row) return;
+
+        var confirm = await DisplayAlert(
+            "Удалить группу?",
+            $"Удалить «{row.Type.Name}»?",
+            "Удалить",
+            "Отмена");
+        if (!confirm) return;
+
+        try
+        {
+            await _vm.DeleteGroupAsync(row.Type.Id);
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Не удалось удалить", ex.Message, "OK");
         }
     }
 }

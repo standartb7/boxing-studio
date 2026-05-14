@@ -26,14 +26,16 @@ public static class MauiProgram
 
 		builder.Services.AddSingleton<PinService>();
 
+		// ViewModels
 		builder.Services.AddTransient<GroupsViewModel>();
-		builder.Services.AddTransient<ClientsViewModel>();
+		builder.Services.AddTransient<SessionsViewModel>();
 
+		// Pages
 		builder.Services.AddTransient<PinSetupPage>();
 		builder.Services.AddTransient<PinEntryPage>();
 		builder.Services.AddTransient<GroupsPage>();
-		builder.Services.AddTransient<ClientsPage>();
-		builder.Services.AddTransient<ClientEditPage>();
+		builder.Services.AddTransient<SessionsPage>();
+		builder.Services.AddTransient<SessionEditPage>();
 
 #if DEBUG
 		builder.Logging.AddDebug();
@@ -44,6 +46,11 @@ public static class MauiProgram
 		using (var scope = app.Services.CreateScope())
 		{
 			var db = scope.ServiceProvider.GetRequiredService<TrainerDbContext>();
+#if DEBUG_WIPE_DB
+			// Включается в csproj через <DefineConstants>$(DefineConstants);DEBUG_WIPE_DB</DefineConstants>.
+			// Пересоздаёт БД на каждом запуске — для смены схемы пока нет миграций.
+			db.Database.EnsureDeleted();
+#endif
 			db.Database.EnsureCreated();
 
 			// Сид: если типов нет — заполняем дефолтными.

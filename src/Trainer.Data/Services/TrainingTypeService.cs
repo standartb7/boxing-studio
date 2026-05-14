@@ -59,9 +59,9 @@ public class TrainingTypeService : ITrainingTypeService
 
     public async Task DeleteAsync(Guid id, CancellationToken ct = default)
     {
-        var hasClients = await _db.Clients.AnyAsync(c => c.TrainingTypeId == id, ct);
-        if (hasClients)
-            throw new InvalidOperationException("Нельзя удалить группу, в которой есть клиенты");
+        var hasSessions = await _db.Sessions.AnyAsync(s => s.TrainingTypeId == id, ct);
+        if (hasSessions)
+            throw new InvalidOperationException("Нельзя удалить тип, в котором есть сессии");
 
         var entity = await _db.TrainingTypes.FindAsync(new object[] { id }, ct);
         if (entity is null) return;
