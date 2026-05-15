@@ -1,3 +1,4 @@
+using Trainer.App.Services;
 using Trainer.Core.Abstractions;
 
 namespace Trainer.App.Pages;
@@ -5,11 +6,62 @@ namespace Trainer.App.Pages;
 public partial class BackupPage : ContentPage
 {
     private readonly IBackupService _backup;
+    private readonly PinService _pin;
+    private readonly BiometricService _biometric;
 
-    public BackupPage(IBackupService backup)
+    public BackupPage(IBackupService backup, PinService pin, BiometricService biometric)
     {
         InitializeComponent();
         _backup = backup;
+        _pin = pin;
+        _biometric = biometric;
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        // Показываем секцию только если на устройстве реально есть биометрия.
+        if (_biometric.IsAvailable())
+        {
+            BiometricSection.IsVisible = true;
+            BiometricLabel.Text = $"{_biometric.DisplayName()} для входа";
+            BiometricHint.Text = $"Вход в приложение через {_biometric.DisplayName()}. PIN останется как запасной вариант.";
+            // Подписку временно отключаем чтобы программное изменение не дёрнуло Toggled.
+            BiometricSwitch.Toggled -= OnBiometricToggled;
+            BiometricSwitch.IsToggled = _pin.IsBiometricEnabled;
+            BiometricSwitch.Toggled += OnBiometricToggled;
+        }
+        else
+        {
+            BiometricSection.IsVisible = false;
+        }
+    }
+
+    private async void OnBiometricToggled(object? sender, ToggledEventArgs e)
+    {
+        if (e.Value)
+        {
+            // Включаем — потребуем подтверждения Face ID/Touch ID, чтобы убедиться,
+            // что юзер реально может им пользоваться (иначе залочится).
+            var ok = await _biometric.AuthenticateAsync($"Включить {_biometric.DisplayName()}");
+            if (ok)
+            {
+                _pin.IsBiometricEnabled = true;
+            }
+            else
+            {
+                _pin.IsBiometricEnabled = false;
+                // Откатываем switch без триггера событий.
+                BiometricSwitch.Toggled -= OnBiometricToggled;
+                BiometricSwitch.IsToggled = false;
+                BiometricSwitch.Toggled += OnBiometricToggled;
+            }
+        }
+        else
+        {
+            _pin.IsBiometricEnabled = false;
+        }
     }
 
     private async void OnExportClicked(object sender, EventArgs e)

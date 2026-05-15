@@ -25,6 +25,7 @@ public static class MauiProgram
 		builder.Services.AddTrainerData(dbPath);
 
 		builder.Services.AddSingleton<PinService>();
+		builder.Services.AddSingleton<BiometricService>();
 
 		// ViewModels
 		builder.Services.AddTransient<GroupsViewModel>();

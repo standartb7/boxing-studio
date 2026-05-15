@@ -30,6 +30,13 @@
                    WidthRequest="200"
                    TextChanged="OnPinTextChanged" />
 
+            <Button x:Name="BiometricBtn"
+                    Text="Face ID"
+                    Style="{StaticResource OutlineButton}"
+                    Clicked="OnBiometricClicked"
+                    IsVisible="False"
+                    HorizontalOptions="Center" />
+
             <Label x:Name="ErrorLabel"
                    TextColor="Red"
                    FontSize="13"

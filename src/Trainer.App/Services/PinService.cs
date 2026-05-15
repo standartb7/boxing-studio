@@ -11,9 +11,17 @@ public class PinService
 {
     private const string HashKey = "pin_hash";
     private const string SaltKey = "pin_salt";
+    private const string BiometricEnabledKey = "biometric_enabled";
 
     public bool IsConfigured =>
         !string.IsNullOrEmpty(Preferences.Default.Get<string?>(HashKey, null));
+
+    /// <summary>Включена ли биометрия (Face ID / Touch ID) для быстрого входа.</summary>
+    public bool IsBiometricEnabled
+    {
+        get => Preferences.Default.Get(BiometricEnabledKey, false);
+        set => Preferences.Default.Set(BiometricEnabledKey, value);
+    }
 
     public void SetPin(string pin)
     {
@@ -40,6 +48,7 @@ public class PinService
     {
         Preferences.Default.Remove(HashKey);
         Preferences.Default.Remove(SaltKey);
+        Preferences.Default.Remove(BiometricEnabledKey);
     }
 
     private static byte[] Hash(string pin, byte[] salt)

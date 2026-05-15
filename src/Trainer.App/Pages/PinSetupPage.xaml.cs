@@ -5,14 +5,16 @@ namespace Trainer.App.Pages;
 public partial class PinSetupPage : ContentPage
 {
     private readonly PinService _pin;
+    private readonly BiometricService _biometric;
 
-    public PinSetupPage(PinService pin)
+    public PinSetupPage(PinService pin, BiometricService biometric)
     {
         InitializeComponent();
         _pin = pin;
+        _biometric = biometric;
     }
 
-    private void OnSaveClicked(object sender, EventArgs e)
+    private async void OnSaveClicked(object sender, EventArgs e)
     {
         var pin = PinEntry.Text?.Trim();
         var confirm = ConfirmEntry.Text?.Trim();
@@ -34,6 +36,24 @@ public partial class PinSetupPage : ContentPage
         }
 
         _pin.SetPin(pin);
+
+        // Если на устройстве есть биометрия — сразу предложим её включить.
+        // Проверяем именно сейчас (через подтверждение Face ID), чтобы юзер дал системное разрешение.
+        if (_biometric.IsAvailable())
+        {
+            var enable = await DisplayAlert(
+                $"Включить {_biometric.DisplayName()}?",
+                $"Можно входить в приложение через {_biometric.DisplayName()}, без PIN-кода. PIN останется как запасной вариант.",
+                "Включить",
+                "Не сейчас");
+            if (enable)
+            {
+                // Сразу проверим что биометрия реально работает — заодно iOS попросит разрешение.
+                var ok = await _biometric.AuthenticateAsync($"Включить {_biometric.DisplayName()}");
+                _pin.IsBiometricEnabled = ok;
+            }
+        }
+
         SwitchToMainShell();
     }
 

@@ -8,6 +8,31 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
 
+            <VerticalStackLayout x:Name="BiometricSection" Spacing="10" IsVisible="False">
+                <Label Text="Безопасность"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+                <Grid ColumnDefinitions="*,Auto" RowSpacing="2">
+                    <Label Grid.Column="0"
+                           x:Name="BiometricLabel"
+                           Text="Face ID для входа"
+                           FontSize="15"
+                           VerticalOptions="Center"
+                           TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+                    <Switch Grid.Column="1"
+                            x:Name="BiometricSwitch"
+                            Toggled="OnBiometricToggled" />
+                </Grid>
+                <Label x:Name="BiometricHint"
+                       FontSize="12"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+
+                <BoxView HeightRequest="1"
+                         Margin="0,8"
+                         Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
+            </VerticalStackLayout>
+
             <Label Text="Экспорт"
                    FontSize="18"
                    FontAttributes="Bold"
