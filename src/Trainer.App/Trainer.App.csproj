@@ -47,6 +47,13 @@
 		<DefineConstants>$(DefineConstants);DEBUG_WIPE_DB</DefineConstants>
 	</PropertyGroup>
 
+	<!-- iOS device signing (только когда билдим под физический iPhone — ios-arm64).
+	     Для симулятора (iossimulator-*) подпись не нужна. -->
+	<PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(RuntimeIdentifier)' == 'ios-arm64'">
+		<CodesignKey>Apple Development: Eugeniu Crivenco (98NY3YRH75)</CodesignKey>
+		<CodesignProvision>BoxingStudioDev</CodesignProvision>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon.png" ForegroundFile="Resources\AppIcon\appicon.png" Color="#FFFFFF" />
