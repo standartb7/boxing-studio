@@ -8,11 +8,10 @@
     <ScrollView>
         <VerticalStackLayout Padding="24" Spacing="16" VerticalOptions="Center">
 
-            <Label Text="TRAINER"
-                   FontSize="32"
-                   FontAttributes="Bold"
-                   HorizontalTextAlignment="Center"
-                   TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+            <Image Source="logo.png"
+                   HeightRequest="140"
+                   Aspect="AspectFit"
+                   HorizontalOptions="Center" />
 
             <Label Text="Придумай PIN-код (4 цифры)"
                    FontSize="16"

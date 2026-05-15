@@ -10,11 +10,10 @@
 
         <VerticalStackLayout Grid.Row="1" Spacing="20" HorizontalOptions="Center">
 
-            <Label Text="TRAINER"
-                   FontSize="32"
-                   FontAttributes="Bold"
-                   HorizontalTextAlignment="Center"
-                   TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+            <Image Source="logo.png"
+                   HeightRequest="140"
+                   Aspect="AspectFit"
+                   HorizontalOptions="Center" />
 
             <Label Text="Введи PIN-код"
                    FontSize="14"
