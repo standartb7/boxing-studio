@@ -59,6 +59,12 @@ public partial class GroupsPage : ContentPage
         }
     }
 
+    private async void OnBackupClicked(object sender, EventArgs e)
+    {
+        var page = _services.GetRequiredService<BackupPage>();
+        await Navigation.PushAsync(page);
+    }
+
     private async void OnDeleteGroupInvoked(object sender, EventArgs e)
     {
         if (sender is not SwipeItem swipe || swipe.BindingContext is not GroupRow row) return;

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Trainer.App.Pages.BackupPage"
+             Title="Бэкап"
+             BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <Label Text="Экспорт"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+            <Label Text="Сохрани все группы, клиентов и сессии в один файл. Можешь отправить его себе на почту, в облако или AirDrop — потом восстановишь на новом телефоне."
+                   FontSize="13"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+            <Button x:Name="ExportBtn"
+                    Text="Экспортировать данные"
+                    Style="{StaticResource AccentButton}"
+                    Clicked="OnExportClicked" />
+
+            <BoxView HeightRequest="1"
+                     Margin="0,8"
+                     Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
+
+            <Label Text="Импорт"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+            <Label Text="Загрузи файл бэкапа. ВНИМАНИЕ: все текущие данные будут заменены данными из файла."
+                   FontSize="13"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+            <Button x:Name="ImportBtn"
+                    Text="Импортировать из файла"
+                    Style="{StaticResource OutlineButton}"
+                    Clicked="OnImportClicked" />
+
+            <Label x:Name="StatusLabel"
+                   FontSize="13"
+                   Margin="0,8,0,0"
+                   IsVisible="False" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

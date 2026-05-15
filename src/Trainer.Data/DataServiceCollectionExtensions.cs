@@ -15,6 +15,7 @@ public static class DataServiceCollectionExtensions
         services.AddScoped<IClientService, ClientService>();
         services.AddScoped<ITrainingTypeService, TrainingTypeService>();
         services.AddScoped<ISessionService, SessionService>();
+        services.AddScoped<IBackupService, BackupService>();
 
         return services;
     }
