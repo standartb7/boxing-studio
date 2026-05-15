@@ -25,9 +25,11 @@ public class TrainerDbContext : DbContext
         b.Entity<Client>(e =>
         {
             e.Property(x => x.Name).IsRequired().HasMaxLength(200);
+            e.Property(x => x.Name).UseCollation("NOCASE");
             e.Property(x => x.Phone).HasMaxLength(50);
             e.Property(x => x.Notes).HasMaxLength(2000);
             e.HasIndex(x => x.IsActive);
+            e.HasIndex(x => x.Name).IsUnique();
         });
 
         b.Entity<Session>(e =>

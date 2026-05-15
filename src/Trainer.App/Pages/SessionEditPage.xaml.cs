@@ -239,7 +239,15 @@ public partial class SessionEditPage : ContentPage
 
         client.Name = name.Trim();
         client.Phone = string.IsNullOrWhiteSpace(phone) ? null : phone.Trim();
-        await _clients.UpdateAsync(client);
+        try
+        {
+            await _clients.UpdateAsync(client);
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Ошибка", ex.Message, "OK");
+            return false;
+        }
         return true;
     }
 
