@@ -41,12 +41,6 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
-	<!-- Пересоздавать SQLite БД при каждом старте в Debug-сборке (пока меняется схема).
-	     Убрать когда введём миграции или схема стабилизируется. -->
-	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-		<DefineConstants>$(DefineConstants);DEBUG_WIPE_DB</DefineConstants>
-	</PropertyGroup>
-
 	<!-- iOS device signing (только когда билдим под физический iPhone — ios-arm64).
 	     Для симулятора (iossimulator-*) подпись не нужна. -->
 	<PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(RuntimeIdentifier)' == 'ios-arm64'">
