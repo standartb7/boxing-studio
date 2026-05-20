@@ -54,7 +54,7 @@ public class SessionsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<SessionDto>> Create(CreateSessionRequest req, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(req.Title)) return BadRequest(new { error = "Title is required." });
+        // Title can be blank — clients render a fallback from member names. Persisted as-is.
         if (!await _db.TrainingTypes.AnyAsync(t => t.Id == req.TrainingTypeId, ct))
             return BadRequest(new { error = "Unknown trainingTypeId." });
 
@@ -67,7 +67,7 @@ public class SessionsController : ControllerBase
 
         var session = new Session
         {
-            Title = req.Title.Trim(),
+            Title = req.Title?.Trim() ?? string.Empty,
             TrainingTypeId = req.TrainingTypeId,
             Notes = req.Notes,
             IsActive = true,
@@ -94,11 +94,10 @@ public class SessionsController : ControllerBase
             .FirstOrDefaultAsync(s => s.Id == id, ct);
         if (session is null) return NotFound();
 
-        if (string.IsNullOrWhiteSpace(req.Title)) return BadRequest(new { error = "Title is required." });
         if (!await _db.TrainingTypes.AnyAsync(t => t.Id == req.TrainingTypeId, ct))
             return BadRequest(new { error = "Unknown trainingTypeId." });
 
-        session.Title = req.Title.Trim();
+        session.Title = req.Title?.Trim() ?? string.Empty;
         session.TrainingTypeId = req.TrainingTypeId;
         session.Notes = req.Notes;
         session.IsActive = req.IsActive;
