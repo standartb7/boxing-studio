@@ -7,6 +7,8 @@ public class Client : EntityBase
     public string? Notes { get; set; }
     public bool IsActive { get; set; } = true;
 
+    public Guid OwnerTrainerId { get; set; }
+
     public List<Session> Sessions { get; set; } = new();
 
     // Алиас для совместимости с UI-биндингами, которые могут использовать FullName.

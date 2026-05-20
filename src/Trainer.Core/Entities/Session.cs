@@ -17,6 +17,8 @@ public class Session : EntityBase
     public string? Notes { get; set; }
     public bool IsActive { get; set; } = true;
 
+    public Guid OwnerTrainerId { get; set; }
+
     /// <summary>
     /// Заголовок для UI: явный Title если задан, иначе имя единственного участника,
     /// иначе fallback. Тренер не должен придумывать названия для личных тренировок.
