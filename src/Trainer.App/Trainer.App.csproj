@@ -69,11 +69,12 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
+		<PackageReference Include="Refit.HttpClientFactory" Version="8.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Trainer.Core\Trainer.Core.csproj" />
-		<ProjectReference Include="..\Trainer.Data\Trainer.Data.csproj" />
+		<ProjectReference Include="..\Trainer.Contracts\Trainer.Contracts.csproj" />
 	</ItemGroup>
 
 </Project>

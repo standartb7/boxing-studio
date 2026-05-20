@@ -57,6 +57,13 @@ TemporaryDependencyNodeTargetIdentifier=net9.0-android
 /warnaserror+:NU1605,SYSLIB0011
 
 [sourceFiles]
+Api/
+ DtoMapping.cs
+ IAuthApi.cs
+ IClientApi.cs
+ ISessionApi.cs
+ ITrainingTypeApi.cs
+ IUserApi.cs
 App.xaml.cs
 AppShell.xaml.cs
 MauiProgram.cs
@@ -69,6 +76,7 @@ Pages/
  BackupPage.xaml.cs
  ClientPickerPage.xaml.cs
  GroupsPage.xaml.cs
+ LoginPage.xaml.cs
  PinEntryPage.xaml.cs
  PinSetupPage.xaml.cs
  SessionEditPage.xaml.cs
@@ -78,7 +86,13 @@ Platforms/Android/
  MainApplication.cs
 Resources/Fonts/FluentUI.cs
 Services/
+ AuthDelegatingHandler.cs
+ AuthService.cs
  BiometricService.cs
+ HttpBackupService.cs
+ HttpClientService.cs
+ HttpSessionService.cs
+ HttpTrainingTypeService.cs
  PinService.cs
 ViewModels/
  GroupsViewModel.cs
@@ -86,8 +100,8 @@ ViewModels/
 
 [metadataReferences]
 ../
+ Trainer.Contracts/obj/Debug/net9.0/ref/Trainer.Contracts.dll
  Trainer.Core/obj/Debug/net9.0/ref/Trainer.Core.dll
- Trainer.Data/obj/Debug/net9.0/ref/Trainer.Data.dll
 <DOTNET>/packs/Microsoft.Android.Ref.35/35.0.24/ref/net9.0/
  Java.Interop.dll
  Mono.Android.dll
@@ -260,21 +274,18 @@ ViewModels/
  WindowsBase.dll
 <NUGET>/
  googlegson/2.11.0.3/lib/net8.0-android34.0/GoogleGson.dll
- microsoft.data.sqlite.core/9.0.0/lib/net8.0/Microsoft.Data.Sqlite.dll
- microsoft.entityframeworkcore.abstractions/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.Abstractions.dll
- microsoft.entityframeworkcore.relational/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.Relational.dll
- microsoft.entityframeworkcore.sqlite.core/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.Sqlite.dll
- microsoft.entityframeworkcore/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.dll
- microsoft.extensions.caching.abstractions/9.0.0/lib/net9.0/Microsoft.Extensions.Caching.Abstractions.dll
- microsoft.extensions.caching.memory/9.0.0/lib/net9.0/Microsoft.Extensions.Caching.Memory.dll
  microsoft.extensions.configuration.abstractions/9.0.0/lib/net9.0/Microsoft.Extensions.Configuration.Abstractions.dll
+ microsoft.extensions.configuration.binder/8.0.0/lib/net8.0/Microsoft.Extensions.Configuration.Binder.dll
  microsoft.extensions.configuration/9.0.0/lib/net9.0/Microsoft.Extensions.Configuration.dll
  microsoft.extensions.dependencyinjection.abstractions/9.0.0/lib/net9.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
  microsoft.extensions.dependencyinjection/9.0.0/lib/net9.0/Microsoft.Extensions.DependencyInjection.dll
- microsoft.extensions.dependencymodel/9.0.0/lib/net9.0/Microsoft.Extensions.DependencyModel.dll
+ microsoft.extensions.diagnostics.abstractions/8.0.1/lib/net8.0/Microsoft.Extensions.Diagnostics.Abstractions.dll
+ microsoft.extensions.diagnostics/8.0.1/lib/net8.0/Microsoft.Extensions.Diagnostics.dll
+ microsoft.extensions.http/8.0.1/lib/net8.0/Microsoft.Extensions.Http.dll
  microsoft.extensions.logging.abstractions/9.0.0/lib/net9.0/Microsoft.Extensions.Logging.Abstractions.dll
  microsoft.extensions.logging.debug/9.0.0/lib/net9.0/Microsoft.Extensions.Logging.Debug.dll
  microsoft.extensions.logging/9.0.0/lib/net9.0/Microsoft.Extensions.Logging.dll
+ microsoft.extensions.options.configurationextensions/8.0.0/lib/net8.0/Microsoft.Extensions.Options.ConfigurationExtensions.dll
  microsoft.extensions.options/9.0.0/lib/net9.0/Microsoft.Extensions.Options.dll
  microsoft.extensions.primitives/9.0.0/lib/net9.0/Microsoft.Extensions.Primitives.dll
  microsoft.maui.controls.core/9.0.14/lib/net9.0-android35.0/Microsoft.Maui.Controls.dll
@@ -282,10 +293,8 @@ ViewModels/
  microsoft.maui.core/9.0.14/lib/net9.0-android35.0/Microsoft.Maui.dll
  microsoft.maui.essentials/9.0.14/lib/net9.0-android35.0/Microsoft.Maui.Essentials.dll
  microsoft.maui.graphics/9.0.14/lib/net9.0-android35.0/Microsoft.Maui.Graphics.dll
- sqlitepclraw.bundle_e_sqlite3/2.1.10/lib/net6.0-android31.0/SQLitePCLRaw.batteries_v2.dll
- sqlitepclraw.core/2.1.10/lib/netstandard2.0/SQLitePCLRaw.core.dll
- sqlitepclraw.lib.e_sqlite3.android/2.1.10/lib/net6.0-android31.0/SQLitePCLRaw.lib.e_sqlite3.android.dll
- sqlitepclraw.provider.e_sqlite3/2.1.10/lib/net6.0/SQLitePCLRaw.provider.e_sqlite3.dll
+ refit.httpclientfactory/8.0.0/lib/net8.0/Refit.HttpClientFactory.dll
+ refit/8.0.0/lib/net8.0/Refit.dll
  xamarin.android.glide.annotations/4.16.0.6/lib/net8.0-android34.0/Xamarin.Android.Glide.Annotations.dll
  xamarin.android.glide.disklrucache/4.16.0.6/lib/net8.0-android34.0/Xamarin.Android.Glide.DiskLruCache.dll
  xamarin.android.glide.gifdecoder/4.16.0.6/lib/net8.0-android34.0/Xamarin.Android.Glide.GifDecoder.dll
@@ -393,7 +402,6 @@ obj/Debug/net9.0-android/_Microsoft.Android.Resource.Designer.dll
  Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll
  Microsoft.CodeAnalysis.NetAnalyzers.dll
 <NUGET>/
- microsoft.entityframeworkcore.analyzers/9.0.0/analyzers/dotnet/cs/Microsoft.EntityFrameworkCore.Analyzers.dll
  microsoft.extensions.logging.abstractions/9.0.0/analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Logging.Generators.dll
  microsoft.extensions.options/9.0.0/analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Options.SourceGeneration.dll
  microsoft.maui.controls.build.tasks/9.0.14/buildTransitive/netstandard2.0/
@@ -402,6 +410,7 @@ obj/Debug/net9.0-android/_Microsoft.Android.Resource.Designer.dll
  microsoft.net.illink.tasks/9.0.1/analyzers/dotnet/cs/
   ILLink.CodeFixProvider.dll
   ILLink.RoslynAnalyzer.dll
+ refit/8.0.0/analyzers/dotnet/roslyn4.1/cs/InterfaceStubGeneratorV2.dll
 
 [analyzerConfigFiles]
 <DOTNET>/sdk/9.0.102/Sdks/Microsoft.NET.Sdk/analyzers/build/config/analysislevel_9_default.globalconfig
@@ -414,6 +423,7 @@ Pages/
  BackupPage.xaml
  ClientPickerPage.xaml
  GroupsPage.xaml
+ LoginPage.xaml
  PinEntryPage.xaml
  PinSetupPage.xaml
  SessionEditPage.xaml
@@ -463,7 +473,6 @@ TemporaryDependencyNodeTargetIdentifier=net9.0-ios
 /debug+
 /debug:portable
 /filealign:512
-/nowin32manifest
 /optimize-
 /out:obj/Debug/net9.0-ios/iossimulator-arm64/Trainer.App.dll
 /refout:obj/Debug/net9.0-ios/iossimulator-arm64/refint/Trainer.App.dll
@@ -475,6 +484,13 @@ TemporaryDependencyNodeTargetIdentifier=net9.0-ios
 /warnaserror+:NU1605,SYSLIB0011
 
 [sourceFiles]
+Api/
+ DtoMapping.cs
+ IAuthApi.cs
+ IClientApi.cs
+ ISessionApi.cs
+ ITrainingTypeApi.cs
+ IUserApi.cs
 App.xaml.cs
 AppShell.xaml.cs
 MauiProgram.cs
@@ -487,6 +503,7 @@ Pages/
  BackupPage.xaml.cs
  ClientPickerPage.xaml.cs
  GroupsPage.xaml.cs
+ LoginPage.xaml.cs
  PinEntryPage.xaml.cs
  PinSetupPage.xaml.cs
  SessionEditPage.xaml.cs
@@ -496,7 +513,13 @@ Platforms/iOS/
  Program.cs
 Resources/Fonts/FluentUI.cs
 Services/
+ AuthDelegatingHandler.cs
+ AuthService.cs
  BiometricService.cs
+ HttpBackupService.cs
+ HttpClientService.cs
+ HttpSessionService.cs
+ HttpTrainingTypeService.cs
  PinService.cs
 ViewModels/
  GroupsViewModel.cs
@@ -504,8 +527,8 @@ ViewModels/
 
 [metadataReferences]
 ../
+ Trainer.Contracts/obj/Debug/net9.0/ref/Trainer.Contracts.dll
  Trainer.Core/obj/Debug/net9.0/ref/Trainer.Core.dll
- Trainer.Data/obj/Debug/net9.0/ref/Trainer.Data.dll
 <DOTNET>/packs/
  Microsoft.iOS.Ref.net9.0_18.2/18.2.9170/ref/net9.0/Microsoft.iOS.dll
  Microsoft.NETCore.App.Ref/9.0.1/ref/net9.0/
@@ -674,21 +697,18 @@ ViewModels/
   System.Xml.XPath.XDocument.dll
   WindowsBase.dll
 <NUGET>/
- microsoft.data.sqlite.core/9.0.0/lib/net8.0/Microsoft.Data.Sqlite.dll
- microsoft.entityframeworkcore.abstractions/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.Abstractions.dll
- microsoft.entityframeworkcore.relational/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.Relational.dll
- microsoft.entityframeworkcore.sqlite.core/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.Sqlite.dll
- microsoft.entityframeworkcore/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.dll
- microsoft.extensions.caching.abstractions/9.0.0/lib/net9.0/Microsoft.Extensions.Caching.Abstractions.dll
- microsoft.extensions.caching.memory/9.0.0/lib/net9.0/Microsoft.Extensions.Caching.Memory.dll
  microsoft.extensions.configuration.abstractions/9.0.0/lib/net9.0/Microsoft.Extensions.Configuration.Abstractions.dll
+ microsoft.extensions.configuration.binder/8.0.0/lib/net8.0/Microsoft.Extensions.Configuration.Binder.dll
  microsoft.extensions.configuration/9.0.0/lib/net9.0/Microsoft.Extensions.Configuration.dll
  microsoft.extensions.dependencyinjection.abstractions/9.0.0/lib/net9.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
  microsoft.extensions.dependencyinjection/9.0.0/lib/net9.0/Microsoft.Extensions.DependencyInjection.dll
- microsoft.extensions.dependencymodel/9.0.0/lib/net9.0/Microsoft.Extensions.DependencyModel.dll
+ microsoft.extensions.diagnostics.abstractions/8.0.1/lib/net8.0/Microsoft.Extensions.Diagnostics.Abstractions.dll
+ microsoft.extensions.diagnostics/8.0.1/lib/net8.0/Microsoft.Extensions.Diagnostics.dll
+ microsoft.extensions.http/8.0.1/lib/net8.0/Microsoft.Extensions.Http.dll
  microsoft.extensions.logging.abstractions/9.0.0/lib/net9.0/Microsoft.Extensions.Logging.Abstractions.dll
  microsoft.extensions.logging.debug/9.0.0/lib/net9.0/Microsoft.Extensions.Logging.Debug.dll
  microsoft.extensions.logging/9.0.0/lib/net9.0/Microsoft.Extensions.Logging.dll
+ microsoft.extensions.options.configurationextensions/8.0.0/lib/net8.0/Microsoft.Extensions.Options.ConfigurationExtensions.dll
  microsoft.extensions.options/9.0.0/lib/net9.0/Microsoft.Extensions.Options.dll
  microsoft.extensions.primitives/9.0.0/lib/net9.0/Microsoft.Extensions.Primitives.dll
  microsoft.maui.controls.core/9.0.14/lib/net9.0-ios18.0/Microsoft.Maui.Controls.dll
@@ -696,10 +716,8 @@ ViewModels/
  microsoft.maui.core/9.0.14/lib/net9.0-ios18.0/Microsoft.Maui.dll
  microsoft.maui.essentials/9.0.14/lib/net9.0-ios18.0/Microsoft.Maui.Essentials.dll
  microsoft.maui.graphics/9.0.14/lib/net9.0-ios18.0/Microsoft.Maui.Graphics.dll
- sqlitepclraw.bundle_e_sqlite3/2.1.10/lib/net6.0-ios14.2/SQLitePCLRaw.batteries_v2.dll
- sqlitepclraw.core/2.1.10/lib/netstandard2.0/SQLitePCLRaw.core.dll
- sqlitepclraw.lib.e_sqlite3.ios/2.1.10/lib/net6.0-ios14.2/SQLitePCLRaw.lib.e_sqlite3.ios.dll
- sqlitepclraw.provider.internal/2.1.10/lib/net6.0/SQLitePCLRaw.provider.internal.dll
+ refit.httpclientfactory/8.0.0/lib/net8.0/Refit.HttpClientFactory.dll
+ refit/8.0.0/lib/net8.0/Refit.dll
 
 [analyzerReferences]
 <DOTNET>/packs/Microsoft.NETCore.App.Ref/9.0.1/analyzers/dotnet/cs/
@@ -713,7 +731,6 @@ ViewModels/
  Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll
  Microsoft.CodeAnalysis.NetAnalyzers.dll
 <NUGET>/
- microsoft.entityframeworkcore.analyzers/9.0.0/analyzers/dotnet/cs/Microsoft.EntityFrameworkCore.Analyzers.dll
  microsoft.extensions.logging.abstractions/9.0.0/analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Logging.Generators.dll
  microsoft.extensions.options/9.0.0/analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Options.SourceGeneration.dll
  microsoft.maui.controls.build.tasks/9.0.14/buildTransitive/netstandard2.0/
@@ -722,6 +739,7 @@ ViewModels/
  microsoft.net.illink.tasks/9.0.1/analyzers/dotnet/cs/
   ILLink.CodeFixProvider.dll
   ILLink.RoslynAnalyzer.dll
+ refit/8.0.0/analyzers/dotnet/roslyn4.1/cs/InterfaceStubGeneratorV2.dll
 
 [analyzerConfigFiles]
 <DOTNET>/sdk/9.0.102/Sdks/Microsoft.NET.Sdk/analyzers/build/config/analysislevel_9_default.globalconfig
@@ -734,6 +752,7 @@ Pages/
  BackupPage.xaml
  ClientPickerPage.xaml
  GroupsPage.xaml
+ LoginPage.xaml
  PinEntryPage.xaml
  PinSetupPage.xaml
  SessionEditPage.xaml
@@ -794,6 +813,13 @@ TemporaryDependencyNodeTargetIdentifier=net9.0-maccatalyst
 /warnaserror+:NU1605,SYSLIB0011
 
 [sourceFiles]
+Api/
+ DtoMapping.cs
+ IAuthApi.cs
+ IClientApi.cs
+ ISessionApi.cs
+ ITrainingTypeApi.cs
+ IUserApi.cs
 App.xaml.cs
 AppShell.xaml.cs
 MauiProgram.cs
@@ -806,6 +832,7 @@ Pages/
  BackupPage.xaml.cs
  ClientPickerPage.xaml.cs
  GroupsPage.xaml.cs
+ LoginPage.xaml.cs
  PinEntryPage.xaml.cs
  PinSetupPage.xaml.cs
  SessionEditPage.xaml.cs
@@ -815,7 +842,13 @@ Platforms/MacCatalyst/
  Program.cs
 Resources/Fonts/FluentUI.cs
 Services/
+ AuthDelegatingHandler.cs
+ AuthService.cs
  BiometricService.cs
+ HttpBackupService.cs
+ HttpClientService.cs
+ HttpSessionService.cs
+ HttpTrainingTypeService.cs
  PinService.cs
 ViewModels/
  GroupsViewModel.cs
@@ -823,8 +856,8 @@ ViewModels/
 
 [metadataReferences]
 ../
+ Trainer.Contracts/obj/Debug/net9.0/ref/Trainer.Contracts.dll
  Trainer.Core/obj/Debug/net9.0/ref/Trainer.Core.dll
- Trainer.Data/obj/Debug/net9.0/ref/Trainer.Data.dll
 <DOTNET>/packs/
  Microsoft.MacCatalyst.Ref.net9.0_18.2/18.2.9170/ref/net9.0/Microsoft.MacCatalyst.dll
  Microsoft.NETCore.App.Ref/9.0.1/ref/net9.0/
@@ -993,21 +1026,18 @@ ViewModels/
   System.Xml.XPath.XDocument.dll
   WindowsBase.dll
 <NUGET>/
- microsoft.data.sqlite.core/9.0.0/lib/net8.0/Microsoft.Data.Sqlite.dll
- microsoft.entityframeworkcore.abstractions/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.Abstractions.dll
- microsoft.entityframeworkcore.relational/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.Relational.dll
- microsoft.entityframeworkcore.sqlite.core/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.Sqlite.dll
- microsoft.entityframeworkcore/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.dll
- microsoft.extensions.caching.abstractions/9.0.0/lib/net9.0/Microsoft.Extensions.Caching.Abstractions.dll
- microsoft.extensions.caching.memory/9.0.0/lib/net9.0/Microsoft.Extensions.Caching.Memory.dll
  microsoft.extensions.configuration.abstractions/9.0.0/lib/net9.0/Microsoft.Extensions.Configuration.Abstractions.dll
+ microsoft.extensions.configuration.binder/8.0.0/lib/net8.0/Microsoft.Extensions.Configuration.Binder.dll
  microsoft.extensions.configuration/9.0.0/lib/net9.0/Microsoft.Extensions.Configuration.dll
  microsoft.extensions.dependencyinjection.abstractions/9.0.0/lib/net9.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
  microsoft.extensions.dependencyinjection/9.0.0/lib/net9.0/Microsoft.Extensions.DependencyInjection.dll
- microsoft.extensions.dependencymodel/9.0.0/lib/net9.0/Microsoft.Extensions.DependencyModel.dll
+ microsoft.extensions.diagnostics.abstractions/8.0.1/lib/net8.0/Microsoft.Extensions.Diagnostics.Abstractions.dll
+ microsoft.extensions.diagnostics/8.0.1/lib/net8.0/Microsoft.Extensions.Diagnostics.dll
+ microsoft.extensions.http/8.0.1/lib/net8.0/Microsoft.Extensions.Http.dll
  microsoft.extensions.logging.abstractions/9.0.0/lib/net9.0/Microsoft.Extensions.Logging.Abstractions.dll
  microsoft.extensions.logging.debug/9.0.0/lib/net9.0/Microsoft.Extensions.Logging.Debug.dll
  microsoft.extensions.logging/9.0.0/lib/net9.0/Microsoft.Extensions.Logging.dll
+ microsoft.extensions.options.configurationextensions/8.0.0/lib/net8.0/Microsoft.Extensions.Options.ConfigurationExtensions.dll
  microsoft.extensions.options/9.0.0/lib/net9.0/Microsoft.Extensions.Options.dll
  microsoft.extensions.primitives/9.0.0/lib/net9.0/Microsoft.Extensions.Primitives.dll
  microsoft.maui.controls.core/9.0.14/lib/net9.0-maccatalyst18.0/Microsoft.Maui.Controls.dll
@@ -1015,9 +1045,8 @@ ViewModels/
  microsoft.maui.core/9.0.14/lib/net9.0-maccatalyst18.0/Microsoft.Maui.dll
  microsoft.maui.essentials/9.0.14/lib/net9.0-maccatalyst18.0/Microsoft.Maui.Essentials.dll
  microsoft.maui.graphics/9.0.14/lib/net9.0-maccatalyst18.0/Microsoft.Maui.Graphics.dll
- sqlitepclraw.bundle_e_sqlite3/2.1.10/lib/netstandard2.0/SQLitePCLRaw.batteries_v2.dll
- sqlitepclraw.core/2.1.10/lib/netstandard2.0/SQLitePCLRaw.core.dll
- sqlitepclraw.provider.e_sqlite3/2.1.10/lib/net6.0/SQLitePCLRaw.provider.e_sqlite3.dll
+ refit.httpclientfactory/8.0.0/lib/net8.0/Refit.HttpClientFactory.dll
+ refit/8.0.0/lib/net8.0/Refit.dll
 
 [analyzerReferences]
 <DOTNET>/packs/Microsoft.NETCore.App.Ref/9.0.1/analyzers/dotnet/cs/
@@ -1031,7 +1060,6 @@ ViewModels/
  Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll
  Microsoft.CodeAnalysis.NetAnalyzers.dll
 <NUGET>/
- microsoft.entityframeworkcore.analyzers/9.0.0/analyzers/dotnet/cs/Microsoft.EntityFrameworkCore.Analyzers.dll
  microsoft.extensions.logging.abstractions/9.0.0/analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Logging.Generators.dll
  microsoft.extensions.options/9.0.0/analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Options.SourceGeneration.dll
  microsoft.maui.controls.build.tasks/9.0.14/buildTransitive/netstandard2.0/
@@ -1040,6 +1068,7 @@ ViewModels/
  microsoft.net.illink.tasks/9.0.1/analyzers/dotnet/cs/
   ILLink.CodeFixProvider.dll
   ILLink.RoslynAnalyzer.dll
+ refit/8.0.0/analyzers/dotnet/roslyn4.1/cs/InterfaceStubGeneratorV2.dll
 
 [analyzerConfigFiles]
 <DOTNET>/sdk/9.0.102/Sdks/Microsoft.NET.Sdk/analyzers/build/config/analysislevel_9_default.globalconfig
@@ -1052,6 +1081,7 @@ Pages/
  BackupPage.xaml
  ClientPickerPage.xaml
  GroupsPage.xaml
+ LoginPage.xaml
  PinEntryPage.xaml
  PinSetupPage.xaml
  SessionEditPage.xaml

@@ -1,15 +1,19 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Refit;
+using Trainer.App.Api;
 using Trainer.App.Pages;
 using Trainer.App.Services;
 using Trainer.App.ViewModels;
-using Trainer.Core.Entities;
-using Trainer.Data;
+using Trainer.Core.Abstractions;
 
 namespace Trainer.App;
 
 public static class MauiProgram
 {
+	// Hard-coded for now; if you need to point at a different backend (staging, local),
+	// override at build time via a partial class / preprocessor define.
+	private const string ApiBaseUrl = "https://boxing-studio.onrender.com";
+
 	public static MauiApp CreateMauiApp()
 	{
 		var builder = MauiApp.CreateBuilder();
@@ -21,9 +25,36 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			});
 
-		var dbPath = Path.Combine(FileSystem.AppDataDirectory, "trainer.db");
-		builder.Services.AddTrainerData(dbPath);
+		// --- Auth + HTTP -----------------------------------------------------
+		builder.Services.AddSingleton<AuthService>();
+		builder.Services.AddTransient<AuthDelegatingHandler>();
 
+		// Named HttpClient reused by HttpBackupService for raw JSON transport.
+		builder.Services.AddHttpClient(HttpBackupService.HttpClientName, c =>
+			{
+				c.BaseAddress = new Uri(ApiBaseUrl);
+			})
+			.AddHttpMessageHandler<AuthDelegatingHandler>();
+
+		// Refit clients — each goes through the same delegating handler so JWT is attached.
+		void AddApi<T>() where T : class =>
+			builder.Services.AddRefitClient<T>()
+				.ConfigureHttpClient(c => c.BaseAddress = new Uri(ApiBaseUrl))
+				.AddHttpMessageHandler<AuthDelegatingHandler>();
+
+		AddApi<IAuthApi>();
+		AddApi<IClientApi>();
+		AddApi<ISessionApi>();
+		AddApi<ITrainingTypeApi>();
+		AddApi<IUserApi>();
+
+		// IClientService etc. now talk to the API. ViewModels are unchanged.
+		builder.Services.AddScoped<IClientService, HttpClientService>();
+		builder.Services.AddScoped<ISessionService, HttpSessionService>();
+		builder.Services.AddScoped<ITrainingTypeService, HttpTrainingTypeService>();
+		builder.Services.AddScoped<IBackupService, HttpBackupService>();
+
+		// Local-only services (PIN, biometric)
 		builder.Services.AddSingleton<PinService>();
 		builder.Services.AddSingleton<BiometricService>();
 
@@ -32,6 +63,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<SessionsViewModel>();
 
 		// Pages
+		builder.Services.AddTransient<LoginPage>();
 		builder.Services.AddTransient<PinSetupPage>();
 		builder.Services.AddTransient<PinEntryPage>();
 		builder.Services.AddTransient<GroupsPage>();
@@ -44,29 +76,6 @@ public static class MauiProgram
 		builder.Logging.AddDebug();
 #endif
 
-		var app = builder.Build();
-
-		using (var scope = app.Services.CreateScope())
-		{
-			var db = scope.ServiceProvider.GetRequiredService<TrainerDbContext>();
-#if DEBUG_WIPE_DB
-			// Включается в csproj через <DefineConstants>$(DefineConstants);DEBUG_WIPE_DB</DefineConstants>.
-			// Пересоздаёт БД на каждом запуске — для смены схемы пока нет миграций.
-			db.Database.EnsureDeleted();
-#endif
-			db.Database.EnsureCreated();
-
-			// Сид: если типов нет — заполняем дефолтными.
-			if (!db.TrainingTypes.Any())
-			{
-				db.TrainingTypes.AddRange(
-					new TrainingType { Name = "Персональные", SortOrder = 1 },
-					new TrainingType { Name = "Групповые",    SortOrder = 2 },
-					new TrainingType { Name = "Детские",      SortOrder = 3 });
-				db.SaveChanges();
-			}
-		}
-
-		return app;
+		return builder.Build();
 	}
 }
