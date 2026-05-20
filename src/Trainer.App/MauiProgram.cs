@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Refit;
 using Trainer.App.Api;
@@ -29,6 +30,16 @@ public static class MauiProgram
 		builder.Services.AddSingleton<AuthService>();
 		builder.Services.AddTransient<AuthDelegatingHandler>();
 
+		// Explicit JSON settings — MAUI trims unused converters from System.Text.Json by
+		// default, which can drop TimeOnly/DateOnly support. Register an explicit
+		// JsonSerializerOptions and reuse it across all Refit clients.
+		var jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
+		{
+			PropertyNameCaseInsensitive = true,
+		};
+		jsonOptions.Converters.Add(new TimeOnlyJsonConverter());
+		var refitSettings = new RefitSettings(new SystemTextJsonContentSerializer(jsonOptions));
+
 		// Named HttpClient reused by HttpBackupService for raw JSON transport.
 		builder.Services.AddHttpClient(HttpBackupService.HttpClientName, c =>
 			{
@@ -39,12 +50,12 @@ public static class MauiProgram
 		// IAuthApi (login / refresh / logout / accept-invite) is anonymous — no Bearer
 		// header — and lives inside AuthDelegatingHandler's loop. Registering it WITH the
 		// handler would create a DI cycle (handler → AuthService → IAuthApi → handler).
-		builder.Services.AddRefitClient<IAuthApi>()
+		builder.Services.AddRefitClient<IAuthApi>(refitSettings)
 			.ConfigureHttpClient(c => c.BaseAddress = new Uri(ApiBaseUrl));
 
 		// Authenticated Refit clients — each goes through the same delegating handler.
 		void AddAuthApi<T>() where T : class =>
-			builder.Services.AddRefitClient<T>()
+			builder.Services.AddRefitClient<T>(refitSettings)
 				.ConfigureHttpClient(c => c.BaseAddress = new Uri(ApiBaseUrl))
 				.AddHttpMessageHandler<AuthDelegatingHandler>();
 

@@ -377,6 +377,11 @@ public partial class SessionEditPage : ContentPage
 
             await Navigation.PopAsync();
         }
+        catch (Refit.ApiException apiEx)
+        {
+            await DisplayAlert("Ошибка сохранения",
+                $"HTTP {(int)apiEx.StatusCode}\n\n{apiEx.Content}", "OK");
+        }
         catch (Exception ex)
         {
             await DisplayAlert("Ошибка сохранения", ex.Message, "OK");
