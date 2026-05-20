@@ -44,13 +44,48 @@ public partial class GroupsPage : ContentPage
             _filter.Reset();
         }
 
+        await ReloadAsync();
+    }
+
+    private async Task ReloadAsync()
+    {
         try
         {
             await _vm.LoadAsync();
+            HideError();
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", ex.Message, "OK");
+            ShowError(ErrorMessageHelper.Format(ex));
+        }
+    }
+
+    private void ShowError(string text)
+    {
+        ErrorText.Text = text;
+        ErrorBanner.IsVisible = true;
+    }
+
+    private void HideError()
+    {
+        ErrorBanner.IsVisible = false;
+    }
+
+    private async void OnRetryClicked(object? sender, EventArgs e)
+    {
+        HideError();
+        await ReloadAsync();
+    }
+
+    private async void OnRefreshing(object? sender, EventArgs e)
+    {
+        try
+        {
+            await ReloadAsync();
+        }
+        finally
+        {
+            Refresher.IsRefreshing = false;
         }
     }
 
@@ -99,14 +134,7 @@ public partial class GroupsPage : ContentPage
         if (TrainerPicker.SelectedItem is not TrainerPickerItem item) return;
 
         _filter.Select(item.Id, item.Label);
-        try
-        {
-            await _vm.LoadAsync();
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("Ошибка", ex.Message, "OK");
-        }
+        await ReloadAsync();
     }
 
     private async void OnGroupSelected(object sender, SelectionChangedEventArgs e)

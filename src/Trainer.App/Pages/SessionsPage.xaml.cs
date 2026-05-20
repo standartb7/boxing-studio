@@ -1,3 +1,4 @@
+using Trainer.App.Services;
 using Trainer.App.ViewModels;
 using Trainer.Core.Entities;
 
@@ -25,14 +26,33 @@ public partial class SessionsPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        await ReloadAsync();
+    }
+
+    private async Task ReloadAsync()
+    {
         try
         {
             await _vm.LoadAsync();
+            ErrorBanner.IsVisible = false;
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", ex.Message, "OK");
+            ErrorText.Text = ErrorMessageHelper.Format(ex);
+            ErrorBanner.IsVisible = true;
         }
+    }
+
+    private async void OnRetryClicked(object? sender, EventArgs e)
+    {
+        ErrorBanner.IsVisible = false;
+        await ReloadAsync();
+    }
+
+    private async void OnRefreshing(object? sender, EventArgs e)
+    {
+        try { await ReloadAsync(); }
+        finally { Refresher.IsRefreshing = false; }
     }
 
     private void OnSearchTextChanged(object sender, TextChangedEventArgs e)

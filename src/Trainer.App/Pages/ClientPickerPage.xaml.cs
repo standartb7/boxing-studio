@@ -46,6 +46,11 @@ public partial class ClientPickerPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        await ReloadAsync();
+    }
+
+    private async Task ReloadAsync()
+    {
         try
         {
             var all = await _clients.GetAllAsync();
@@ -63,11 +68,19 @@ public partial class ClientPickerPage : ContentPage
 
             _all = filtered;
             ApplyFilter();
+            ErrorBanner.IsVisible = false;
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", ex.Message, "OK");
+            ErrorText.Text = ErrorMessageHelper.Format(ex);
+            ErrorBanner.IsVisible = true;
         }
+    }
+
+    private async void OnRetryClicked(object? sender, EventArgs e)
+    {
+        ErrorBanner.IsVisible = false;
+        await ReloadAsync();
     }
 
     private void OnSearchTextChanged(object sender, TextChangedEventArgs e) => ApplyFilter();
@@ -172,10 +185,5 @@ public partial class ClientPickerPage : ContentPage
         }
     }
 
-    private static string FormatError(Exception ex)
-    {
-        if (ex is ApiException api)
-            return string.IsNullOrWhiteSpace(api.Content) ? $"HTTP {(int)api.StatusCode}" : api.Content;
-        return ex.Message;
-    }
+    private static string FormatError(Exception ex) => ErrorMessageHelper.Format(ex);
 }

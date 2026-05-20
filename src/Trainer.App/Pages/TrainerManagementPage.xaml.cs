@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
-using Refit;
 using Trainer.App.Api;
+using Trainer.App.Services;
 using Trainer.Contracts;
 
 namespace Trainer.App.Pages;
@@ -111,10 +111,5 @@ public partial class TrainerManagementPage : ContentPage
         }
     }
 
-    private static string FormatError(Exception ex)
-    {
-        if (ex is ApiException api)
-            return string.IsNullOrWhiteSpace(api.Content) ? $"HTTP {(int)api.StatusCode}" : api.Content;
-        return ex.Message;
-    }
+    private static string FormatError(Exception ex) => ErrorMessageHelper.Format(ex);
 }

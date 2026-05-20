@@ -6,10 +6,27 @@
              Title="Сессии"
              NavigationPage.BackButtonTitle="Назад">
 
-    <Grid RowDefinitions="Auto,*,Auto" Padding="12,16,12,12">
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="12,16,12,12">
+
+        <Border x:Name="ErrorBanner"
+                Grid.Row="0"
+                Padding="12,8"
+                Margin="0,0,0,8"
+                StrokeThickness="0"
+                BackgroundColor="#FFE2E2"
+                IsVisible="False">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8" />
+            </Border.StrokeShape>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" VerticalOptions="Center">
+                <Label Grid.Column="0" x:Name="ErrorText" FontSize="13" TextColor="#8B0000" VerticalOptions="Center" />
+                <Button Grid.Column="1" Text="Повторить" FontSize="13" Padding="12,4"
+                        BackgroundColor="#8B0000" TextColor="White" Clicked="OnRetryClicked" />
+            </Grid>
+        </Border>
 
         <Entry x:Name="SearchBox"
-               Grid.Row="0"
+               Grid.Row="1"
                Margin="0,0,0,8"
                Placeholder="Поиск по названию или участникам"
                TextChanged="OnSearchTextChanged"
@@ -17,8 +34,8 @@
                TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}"
                PlaceholderColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
 
+        <RefreshView Grid.Row="2" x:Name="Refresher" Refreshing="OnRefreshing">
         <CollectionView x:Name="SessionsList"
-                        Grid.Row="1"
                         SelectionMode="Single"
                         SelectionChanged="OnSessionSelected">
             <CollectionView.ItemsLayout>
@@ -77,8 +94,9 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+        </RefreshView>
 
-        <Button Grid.Row="2"
+        <Button Grid.Row="3"
                 Text="Добавить сессию"
                 Style="{StaticResource AccentButton}"
                 Clicked="OnAddClicked"
