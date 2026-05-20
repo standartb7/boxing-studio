@@ -40,6 +40,15 @@ public static class TestData
         return client.Id;
     }
 
+    public static async Task AddSessionMemberAsync(
+        TestApiFactory factory, Guid sessionId, Guid clientId)
+    {
+        using var scope = factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<TrainerDbContext>();
+        db.SessionMembers.Add(new SessionMember { SessionId = sessionId, ClientId = clientId });
+        await db.SaveChangesAsync();
+    }
+
     public static async Task<Guid> SeedSessionAsync(
         TestApiFactory factory, Guid ownerTrainerId, string title)
     {

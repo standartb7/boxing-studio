@@ -28,24 +28,51 @@ public class RoleScopingTests : IAsyncLifetime
         _client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", TestData.IssueAccessToken(_factory, user));
 
-    // ---- Clients are gym-wide --------------------------------------------
+    // ---- Clients: gym-wide in DB, visible only through own sessions -------
 
     [Fact]
-    public async Task All_trainers_see_all_clients()
+    public async Task Trainer_only_sees_clients_from_own_sessions()
     {
         var a = await TestData.SeedUserAsync(_factory, "a@gym.test", "pw", UserRole.Trainer);
-        await TestData.SeedUserAsync(_factory, "b@gym.test", "pw", UserRole.Trainer);
-        await TestData.SeedClientAsync(_factory, "Alice");
-        await TestData.SeedClientAsync(_factory, "Bob");
+        var b = await TestData.SeedUserAsync(_factory, "b@gym.test", "pw", UserRole.Trainer);
+
+        var alice = await TestData.SeedClientAsync(_factory, "Alice");   // in A's session
+        var bob = await TestData.SeedClientAsync(_factory, "Bob");       // shared A + B
+        var carol = await TestData.SeedClientAsync(_factory, "Carol");   // only in B's session
+
+        var aSession = await TestData.SeedSessionAsync(_factory, a.Id, "A's");
+        var bSession = await TestData.SeedSessionAsync(_factory, b.Id, "B's");
+        await TestData.AddSessionMemberAsync(_factory, aSession, alice);
+        await TestData.AddSessionMemberAsync(_factory, aSession, bob);
+        await TestData.AddSessionMemberAsync(_factory, bSession, bob);
+        await TestData.AddSessionMemberAsync(_factory, bSession, carol);
 
         AuthAs(a);
         var list = await _client.GetFromJsonAsync<List<ClientDto>>("/api/clients");
+        Assert.NotNull(list);
         Assert.Equal(2, list!.Count);
+        Assert.Contains(list, c => c.Name == "Alice");
+        Assert.Contains(list, c => c.Name == "Bob");
+        Assert.DoesNotContain(list, c => c.Name == "Carol");
+    }
+
+    [Fact]
+    public async Task HeadTrainer_sees_all_clients_regardless_of_session_membership()
+    {
+        var head = await TestData.SeedUserAsync(_factory, "h@gym.test", "pw", UserRole.HeadTrainer);
+        await TestData.SeedClientAsync(_factory, "Detached");   // not in any session
+
+        AuthAs(head);
+        var list = await _client.GetFromJsonAsync<List<ClientDto>>("/api/clients");
+        Assert.Single(list!);
+        Assert.Equal("Detached", list![0].Name);
     }
 
     [Fact]
     public async Task Trainer_can_create_a_client()
     {
+        // Creation is always allowed — clients only become visible to the trainer
+        // once added to one of their sessions, but Create itself isn't scoped.
         var trainer = await TestData.SeedUserAsync(_factory, "a@gym.test", "pw", UserRole.Trainer);
         AuthAs(trainer);
 
@@ -57,6 +84,26 @@ public class RoleScopingTests : IAsyncLifetime
         Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
         var dto = await resp.Content.ReadFromJsonAsync<ClientDto>();
         Assert.Equal("Eve", dto!.Name);
+    }
+
+    [Fact]
+    public async Task Trainer_cannot_edit_a_client_not_in_their_sessions()
+    {
+        var a = await TestData.SeedUserAsync(_factory, "a@gym.test", "pw", UserRole.Trainer);
+        var b = await TestData.SeedUserAsync(_factory, "b@gym.test", "pw", UserRole.Trainer);
+        var carol = await TestData.SeedClientAsync(_factory, "Carol");
+        var bSession = await TestData.SeedSessionAsync(_factory, b.Id, "B's");
+        await TestData.AddSessionMemberAsync(_factory, bSession, carol);
+
+        AuthAs(a);
+        var resp = await _client.PutAsJsonAsync($"/api/clients/{carol}", new UpdateClientRequest
+        {
+            Name = "Carolyn",
+            IsActive = true,
+        });
+        // Scoped() excludes Carol from A's view, so the controller returns 404
+        // (we deliberately don't leak 403 — that would confirm the row exists).
+        Assert.Equal(HttpStatusCode.NotFound, resp.StatusCode);
     }
 
     // ---- Sessions are still per-trainer ----------------------------------

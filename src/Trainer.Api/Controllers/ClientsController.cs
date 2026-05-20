@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Trainer.Api.Auth;
 using Trainer.Api.Mapping;
 using Trainer.Contracts;
 using Trainer.Core.Entities;
@@ -9,9 +10,10 @@ using Trainer.Data;
 namespace Trainer.Api.Controllers;
 
 /// <summary>
-/// Clients are gym-wide — every active trainer can read and edit any client. A
-/// client may train with several trainers in parallel (group with one, personal
-/// with another), so ownership belongs to Session, not Client.
+/// Clients live gym-wide in the database — one client can train with several
+/// trainers (group with one, personal with another). Visibility is derived from
+/// session membership: a regular Trainer only sees clients who are members of at
+/// least one session they own. HeadTrainer sees everyone.
 /// </summary>
 [ApiController]
 [Authorize]
@@ -19,13 +21,30 @@ namespace Trainer.Api.Controllers;
 public class ClientsController : ControllerBase
 {
     private readonly TrainerDbContext _db;
+    private readonly ITrainerScope _scope;
 
-    public ClientsController(TrainerDbContext db) => _db = db;
+    public ClientsController(TrainerDbContext db, ITrainerScope scope)
+    {
+        _db = db;
+        _scope = scope;
+    }
+
+    /// <summary>Clients visible to the current user.</summary>
+    private IQueryable<Client> Scoped()
+    {
+        if (_scope.IsHeadTrainer) return _db.Clients;
+        var myClientIds =
+            from m in _db.SessionMembers
+            join s in _db.Sessions on m.SessionId equals s.Id
+            where s.OwnerTrainerId == _scope.UserId
+            select m.ClientId;
+        return _db.Clients.Where(c => myClientIds.Contains(c.Id));
+    }
 
     [HttpGet]
     public async Task<ActionResult<List<ClientDto>>> GetAll(CancellationToken ct)
     {
-        var list = await _db.Clients.AsNoTracking()
+        var list = await Scoped().AsNoTracking()
             .Where(c => c.IsActive)
             .OrderBy(c => c.Name)
             .Select(c => c.ToDto())
@@ -36,7 +55,7 @@ public class ClientsController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<ClientDto>> GetById(Guid id, CancellationToken ct)
     {
-        var c = await _db.Clients.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, ct);
+        var c = await Scoped().AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, ct);
         return c is null ? NotFound() : Ok(c.ToDto());
     }
 
@@ -68,7 +87,8 @@ public class ClientsController : ControllerBase
         if (string.IsNullOrWhiteSpace(req.Name))
             return BadRequest(new { error = "Name is required." });
 
-        var client = await _db.Clients.FirstOrDefaultAsync(c => c.Id == id, ct);
+        // Only clients the caller can see may be edited.
+        var client = await Scoped().FirstOrDefaultAsync(c => c.Id == id, ct);
         if (client is null) return NotFound();
 
         var name = req.Name.Trim();
@@ -86,7 +106,7 @@ public class ClientsController : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
-        var client = await _db.Clients.FirstOrDefaultAsync(c => c.Id == id, ct);
+        var client = await Scoped().FirstOrDefaultAsync(c => c.Id == id, ct);
         if (client is null) return NotFound();
 
         var hasActiveSessions = await _db.SessionMembers
