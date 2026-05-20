@@ -170,6 +170,7 @@ public partial class BackupPage : ContentPage
 
         try { await _auth.LogoutAsync(); } catch { /* offline — wipe locally anyway */ }
         _pin.Reset();
+        _services.GetRequiredService<TrainerFilterContext>().Reset();
 
         if (Application.Current?.Windows.Count > 0)
         {

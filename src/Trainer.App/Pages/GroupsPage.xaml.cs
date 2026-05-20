@@ -70,10 +70,19 @@ public partial class GroupsPage : ContentPage
             foreach (var t in trainers)
                 _pickerItems.Add(new TrainerPickerItem(t.Id, t.DisplayName));
 
+            // First time after login: default to the current HeadTrainer (their own clients),
+            // not 'Все'. After that, respect whatever they last picked.
+            if (!_filter.IsInitialized && _auth.CurrentUserId is { } selfId)
+            {
+                var selfName = trainers.FirstOrDefault(t => t.Id == selfId)?.DisplayName
+                    ?? _auth.CurrentUserDisplayName
+                    ?? "Я";
+                _filter.Select(selfId, selfName);
+            }
+
             _suppressPickerEvent = true;
             TrainerPicker.ItemsSource = _pickerItems;
             TrainerPicker.ItemDisplayBinding = new Binding(nameof(TrainerPickerItem.Label));
-            // Match the current filter (preserved across navigation).
             var currentIdx = _pickerItems.FindIndex(i => i.Id == _filter.SelectedOwnerTrainerId);
             TrainerPicker.SelectedIndex = currentIdx < 0 ? 0 : currentIdx;
             _suppressPickerEvent = false;
