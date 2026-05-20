@@ -29,14 +29,23 @@ public class ClientsController : ControllerBase
             : _db.Clients.Where(c => c.OwnerTrainerId == _scope.UserId);
 
     [HttpGet]
-    public async Task<ActionResult<List<ClientDto>>> GetAll(CancellationToken ct)
+    public async Task<ActionResult<List<ClientDto>>> GetAll(
+        [FromQuery] Guid? ownerTrainerId, CancellationToken ct)
     {
         // Left-join on User so we can ship OwnerDisplayName alongside the Guid. EF Core
         // translates GroupJoin + DefaultIfEmpty into a LEFT JOIN, so clients owned by a
         // user that was later hard-deleted still show up with OwnerDisplayName = null.
+        var q = Scoped().AsNoTracking().Where(c => c.IsActive);
+        if (ownerTrainerId is { } owner)
+        {
+            // HeadTrainer can narrow to anyone; a regular Trainer can only filter to self
+            // (it'd be a no-op anyway but enforced to avoid leaking that someone exists).
+            if (!_scope.IsHeadTrainer && owner != _scope.UserId) return Forbid();
+            q = q.Where(c => c.OwnerTrainerId == owner);
+        }
+
         var rows = await (
-            from c in Scoped().AsNoTracking()
-            where c.IsActive
+            from c in q
             join u in _db.Users on c.OwnerTrainerId equals u.Id into us
             from u in us.DefaultIfEmpty()
             orderby c.Name

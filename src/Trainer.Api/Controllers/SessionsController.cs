@@ -29,13 +29,21 @@ public class SessionsController : ControllerBase
             : _db.Sessions.Where(s => s.OwnerTrainerId == _scope.UserId);
 
     [HttpGet]
-    public async Task<ActionResult<List<SessionDto>>> GetAll([FromQuery] Guid? trainingTypeId, CancellationToken ct)
+    public async Task<ActionResult<List<SessionDto>>> GetAll(
+        [FromQuery] Guid? trainingTypeId,
+        [FromQuery] Guid? ownerTrainerId,
+        CancellationToken ct)
     {
         var q = Scoped().AsNoTracking()
             .Include(s => s.Schedule)
             .Include(s => s.Members)
             .Where(s => s.IsActive);
         if (trainingTypeId is { } tid) q = q.Where(s => s.TrainingTypeId == tid);
+        if (ownerTrainerId is { } owner)
+        {
+            if (!_scope.IsHeadTrainer && owner != _scope.UserId) return Forbid();
+            q = q.Where(s => s.OwnerTrainerId == owner);
+        }
 
         var list = await q.OrderBy(s => s.Title).ToListAsync(ct);
         return Ok(list.Select(s => s.ToDto()).ToList());

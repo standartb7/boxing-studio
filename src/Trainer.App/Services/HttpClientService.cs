@@ -13,16 +13,18 @@ public class HttpClientService : IClientService
 {
     private readonly IClientApi _api;
     private readonly ISessionApi _sessions;
+    private readonly TrainerFilterContext _filter;
 
-    public HttpClientService(IClientApi api, ISessionApi sessions)
+    public HttpClientService(IClientApi api, ISessionApi sessions, TrainerFilterContext filter)
     {
         _api = api;
         _sessions = sessions;
+        _filter = filter;
     }
 
     public async Task<IReadOnlyList<Client>> GetAllAsync(CancellationToken ct = default)
     {
-        var dtos = await _api.GetAllAsync(ct);
+        var dtos = await _api.GetAllAsync(_filter.SelectedOwnerTrainerId, ct);
         return dtos.Select(d => d.ToEntity()).ToList();
     }
 
@@ -71,7 +73,7 @@ public class HttpClientService : IClientService
     {
         // Server doesn't have a dedicated endpoint yet — derive from the sessions list.
         // Cheap enough at expected scale (tens of sessions per gym).
-        var sessions = await _sessions.GetAllAsync(ct: ct);
+        var sessions = await _sessions.GetAllAsync(ownerTrainerId: _filter.SelectedOwnerTrainerId, ct: ct);
         var counts = new Dictionary<Guid, int>();
         foreach (var s in sessions)
             foreach (var clientId in s.MemberIds)

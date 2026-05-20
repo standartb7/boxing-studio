@@ -9,22 +9,24 @@ public class HttpSessionService : ISessionService
 {
     private readonly ISessionApi _api;
     private readonly IClientApi _clients;
+    private readonly TrainerFilterContext _filter;
 
-    public HttpSessionService(ISessionApi api, IClientApi clients)
+    public HttpSessionService(ISessionApi api, IClientApi clients, TrainerFilterContext filter)
     {
         _api = api;
         _clients = clients;
+        _filter = filter;
     }
 
     public async Task<IReadOnlyList<Session>> GetByTypeAsync(Guid trainingTypeId, CancellationToken ct = default)
     {
-        var dtos = await _api.GetAllAsync(trainingTypeId, ct);
+        var dtos = await _api.GetAllAsync(trainingTypeId, _filter.SelectedOwnerTrainerId, ct);
         return (await HydrateMembersAsync(dtos, ct)).ToList();
     }
 
     public async Task<IReadOnlyDictionary<Guid, int>> GetCountsByTypeAsync(CancellationToken ct = default)
     {
-        var dtos = await _api.GetAllAsync(ct: ct);
+        var dtos = await _api.GetAllAsync(ownerTrainerId: _filter.SelectedOwnerTrainerId, ct: ct);
         return dtos.GroupBy(s => s.TrainingTypeId)
             .ToDictionary(g => g.Key, g => g.Count());
     }
@@ -125,7 +127,9 @@ public class HttpSessionService : ISessionService
         var memberIds = sessions.SelectMany(s => s.Members.Select(m => m.Id)).Distinct().ToHashSet();
         if (memberIds.Count == 0) return sessions;
 
-        var clients = await _clients.GetAllAsync(ct);
+        // Don't apply the trainer filter here — we want client display names for *all* members
+        // of the session, even those owned by other trainers.
+        var clients = await _clients.GetAllAsync(ownerTrainerId: null, ct);
         var byId = clients.Where(c => memberIds.Contains(c.Id)).ToDictionary(c => c.Id, c => c.ToEntity());
 
         foreach (var s in sessions)

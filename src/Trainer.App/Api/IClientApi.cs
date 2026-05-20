@@ -6,7 +6,7 @@ namespace Trainer.App.Api;
 public interface IClientApi
 {
     [Get("/api/clients")]
-    Task<List<ClientDto>> GetAllAsync(CancellationToken ct = default);
+    Task<List<ClientDto>> GetAllAsync([Query] Guid? ownerTrainerId = null, CancellationToken ct = default);
 
     [Get("/api/clients/{id}")]
     Task<ClientDto> GetByIdAsync(Guid id, CancellationToken ct = default);

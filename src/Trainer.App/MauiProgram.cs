@@ -28,6 +28,7 @@ public static class MauiProgram
 
 		// --- Auth + HTTP -----------------------------------------------------
 		builder.Services.AddSingleton<AuthService>();
+		builder.Services.AddSingleton<TrainerFilterContext>();
 		builder.Services.AddTransient<AuthDelegatingHandler>();
 
 		// Explicit JSON settings — MAUI trims unused converters from System.Text.Json by

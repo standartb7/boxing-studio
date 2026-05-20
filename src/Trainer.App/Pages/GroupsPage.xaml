@@ -12,10 +12,37 @@
         <ToolbarItem Text="+ Группа" Clicked="OnAddGroupClicked" />
     </ContentPage.ToolbarItems>
 
-    <CollectionView x:Name="GroupsList"
-                    Margin="12,16,12,12"
-                    SelectionMode="Single"
-                    SelectionChanged="OnGroupSelected">
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- HeadTrainer trainer filter — hidden for regular trainers. -->
+        <Border x:Name="TrainerFilterBar"
+                Grid.Row="0"
+                Padding="12,8"
+                Margin="12,12,12,0"
+                StrokeThickness="1"
+                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                IsVisible="False">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8" />
+            </Border.StrokeShape>
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" VerticalOptions="Center">
+                <Label Grid.Column="0"
+                       Text="Тренер:"
+                       FontSize="13"
+                       VerticalOptions="Center"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+                <Picker Grid.Column="1"
+                        x:Name="TrainerPicker"
+                        FontSize="14"
+                        SelectedIndexChanged="OnTrainerPickerChanged" />
+            </Grid>
+        </Border>
+
+        <CollectionView x:Name="GroupsList"
+                        Grid.Row="1"
+                        Margin="12,16,12,12"
+                        SelectionMode="Single"
+                        SelectionChanged="OnGroupSelected">
         <CollectionView.ItemsLayout>
             <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
         </CollectionView.ItemsLayout>
@@ -69,5 +96,7 @@
             </DataTemplate>
         </CollectionView.ItemTemplate>
     </CollectionView>
+
+    </Grid>
 
 </ContentPage>

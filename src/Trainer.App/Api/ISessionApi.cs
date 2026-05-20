@@ -6,7 +6,7 @@ namespace Trainer.App.Api;
 public interface ISessionApi
 {
     [Get("/api/sessions")]
-    Task<List<SessionDto>> GetAllAsync([Query] Guid? trainingTypeId = null, CancellationToken ct = default);
+    Task<List<SessionDto>> GetAllAsync([Query] Guid? trainingTypeId = null, [Query] Guid? ownerTrainerId = null, CancellationToken ct = default);
 
     [Get("/api/sessions/{id}")]
     Task<SessionDto> GetByIdAsync(Guid id, CancellationToken ct = default);
