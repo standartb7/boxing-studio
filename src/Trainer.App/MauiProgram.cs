@@ -36,17 +36,22 @@ public static class MauiProgram
 			})
 			.AddHttpMessageHandler<AuthDelegatingHandler>();
 
-		// Refit clients — each goes through the same delegating handler so JWT is attached.
-		void AddApi<T>() where T : class =>
+		// IAuthApi (login / refresh / logout / accept-invite) is anonymous — no Bearer
+		// header — and lives inside AuthDelegatingHandler's loop. Registering it WITH the
+		// handler would create a DI cycle (handler → AuthService → IAuthApi → handler).
+		builder.Services.AddRefitClient<IAuthApi>()
+			.ConfigureHttpClient(c => c.BaseAddress = new Uri(ApiBaseUrl));
+
+		// Authenticated Refit clients — each goes through the same delegating handler.
+		void AddAuthApi<T>() where T : class =>
 			builder.Services.AddRefitClient<T>()
 				.ConfigureHttpClient(c => c.BaseAddress = new Uri(ApiBaseUrl))
 				.AddHttpMessageHandler<AuthDelegatingHandler>();
 
-		AddApi<IAuthApi>();
-		AddApi<IClientApi>();
-		AddApi<ISessionApi>();
-		AddApi<ITrainingTypeApi>();
-		AddApi<IUserApi>();
+		AddAuthApi<IClientApi>();
+		AddAuthApi<ISessionApi>();
+		AddAuthApi<ITrainingTypeApi>();
+		AddAuthApi<IUserApi>();
 
 		// IClientService etc. now talk to the API. ViewModels are unchanged.
 		builder.Services.AddScoped<IClientService, HttpClientService>();
