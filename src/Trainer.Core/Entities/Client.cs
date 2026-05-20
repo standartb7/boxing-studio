@@ -7,18 +7,8 @@ public class Client : EntityBase
     public string? Notes { get; set; }
     public bool IsActive { get; set; } = true;
 
-    public Guid OwnerTrainerId { get; set; }
-
-    /// <summary>
-    /// Display name of the owning trainer — populated by the mobile mapper from
-    /// ClientDto. Not persisted in the database (server keeps the join out of EF).
-    /// </summary>
-    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
-    public string? OwnerDisplayName { get; set; }
-
-    /// <summary>Set by the mobile UI when the current user is a HeadTrainer — drives the reassign swipe action visibility.</summary>
-    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
-    public bool CanReassign { get; set; }
+    // Clients are gym-wide — they may attend group sessions with one trainer and
+    // personal sessions with another. Ownership lives on Session, not Client.
 
     public List<Session> Sessions { get; set; } = new();
 

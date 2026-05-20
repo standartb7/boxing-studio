@@ -75,6 +75,16 @@
                                     <Label Text="{Binding ScheduleDisplay}"
                                            FontSize="13"
                                            TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+                                    <Label Text="{Binding OwnerDisplayName, StringFormat='тренер: {0}'}"
+                                           FontSize="11"
+                                           FontAttributes="Italic"
+                                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding OwnerDisplayName}" Value="{x:Null}">
+                                                <Setter Property="IsVisible" Value="False" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
                                 </VerticalStackLayout>
                                 <Border Grid.Column="1"
                                         Padding="10,4"

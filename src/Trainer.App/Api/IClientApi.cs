@@ -6,7 +6,7 @@ namespace Trainer.App.Api;
 public interface IClientApi
 {
     [Get("/api/clients")]
-    Task<List<ClientDto>> GetAllAsync([Query] Guid? ownerTrainerId = null, CancellationToken ct = default);
+    Task<List<ClientDto>> GetAllAsync(CancellationToken ct = default);
 
     [Get("/api/clients/{id}")]
     Task<ClientDto> GetByIdAsync(Guid id, CancellationToken ct = default);
@@ -19,7 +19,4 @@ public interface IClientApi
 
     [Delete("/api/clients/{id}")]
     Task DeleteAsync(Guid id, CancellationToken ct = default);
-
-    [Post("/api/clients/{id}/reassign")]
-    Task<ClientDto> ReassignAsync(Guid id, [Body] ReassignClientRequest req, CancellationToken ct = default);
 }

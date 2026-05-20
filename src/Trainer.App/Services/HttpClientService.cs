@@ -24,7 +24,8 @@ public class HttpClientService : IClientService
 
     public async Task<IReadOnlyList<Client>> GetAllAsync(CancellationToken ct = default)
     {
-        var dtos = await _api.GetAllAsync(_filter.SelectedOwnerTrainerId, ct);
+        // Clients are gym-wide — no trainer filter applied.
+        var dtos = await _api.GetAllAsync(ct);
         return dtos.Select(d => d.ToEntity()).ToList();
     }
 
@@ -44,7 +45,6 @@ public class HttpClientService : IClientService
             Name = client.Name,
             Phone = client.Phone,
             Notes = client.Notes,
-            OwnerTrainerId = client.OwnerTrainerId == Guid.Empty ? null : client.OwnerTrainerId,
         }, ct);
         return dto.ToEntity();
     }

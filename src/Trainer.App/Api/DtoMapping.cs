@@ -17,8 +17,6 @@ public static class DtoMapping
         Phone = d.Phone,
         Notes = d.Notes,
         IsActive = d.IsActive,
-        OwnerTrainerId = d.OwnerTrainerId,
-        OwnerDisplayName = d.OwnerDisplayName,
         CreatedAt = d.CreatedAt,
         UpdatedAt = d.UpdatedAt,
     };
@@ -38,6 +36,7 @@ public static class DtoMapping
         Notes = d.Notes,
         IsActive = d.IsActive,
         OwnerTrainerId = d.OwnerTrainerId,
+        OwnerDisplayName = d.OwnerDisplayName,
         CreatedAt = d.CreatedAt,
         UpdatedAt = d.UpdatedAt,
         Schedule = d.Schedule.Select(sl => new ScheduleSlot

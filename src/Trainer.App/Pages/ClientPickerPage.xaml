@@ -84,45 +84,24 @@
 
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="entities:Client">
-                    <SwipeView>
-                        <SwipeView.RightItems>
-                            <SwipeItems Mode="Reveal">
-                                <SwipeItem Text="Передать"
-                                           BackgroundColor="#1976D2"
-                                           Invoked="OnReassignSwipe"
-                                           IsVisible="{Binding CanReassign}" />
-                            </SwipeItems>
-                        </SwipeView.RightItems>
-
-                        <Border Padding="14"
-                                Margin="0,4"
-                                StrokeThickness="1"
-                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
-                                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="8" />
-                            </Border.StrokeShape>
-                            <VerticalStackLayout Spacing="3">
-                                <Label Text="{Binding Name}"
-                                       FontAttributes="Bold"
-                                       FontSize="15"
-                                       TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
-                                <Label Text="{Binding Phone}"
-                                       FontSize="12"
-                                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
-                                <Label Text="{Binding OwnerDisplayName, StringFormat='тренер: {0}'}"
-                                       FontSize="11"
-                                       FontAttributes="Italic"
-                                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}">
-                                    <Label.Triggers>
-                                        <DataTrigger TargetType="Label" Binding="{Binding OwnerDisplayName}" Value="{x:Null}">
-                                            <Setter Property="IsVisible" Value="False" />
-                                        </DataTrigger>
-                                    </Label.Triggers>
-                                </Label>
-                            </VerticalStackLayout>
-                        </Border>
-                    </SwipeView>
+                    <Border Padding="14"
+                            Margin="0,4"
+                            StrokeThickness="1"
+                            Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <VerticalStackLayout Spacing="3">
+                            <Label Text="{Binding Name}"
+                                   FontAttributes="Bold"
+                                   FontSize="15"
+                                   TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+                            <Label Text="{Binding Phone}"
+                                   FontSize="12"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+                        </VerticalStackLayout>
+                    </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>

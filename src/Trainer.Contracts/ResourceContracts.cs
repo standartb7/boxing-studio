@@ -25,9 +25,6 @@ public class ClientDto
     public string? Phone { get; set; }
     public string? Notes { get; set; }
     public bool IsActive { get; set; }
-    public Guid OwnerTrainerId { get; set; }
-    /// <summary>DisplayName of the owning trainer; null if the trainer was hard-deleted.</summary>
-    public string? OwnerDisplayName { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
 }
@@ -37,8 +34,6 @@ public class CreateClientRequest
     public string Name { get; set; } = string.Empty;
     public string? Phone { get; set; }
     public string? Notes { get; set; }
-    // Optional: HeadTrainer can specify owner. Regular Trainer's owner is ignored / forced to self.
-    public Guid? OwnerTrainerId { get; set; }
 }
 
 public class UpdateClientRequest
@@ -47,11 +42,6 @@ public class UpdateClientRequest
     public string? Phone { get; set; }
     public string? Notes { get; set; }
     public bool IsActive { get; set; }
-}
-
-public class ReassignClientRequest
-{
-    public Guid NewOwnerTrainerId { get; set; }
 }
 
 public class TrainingTypeDto
@@ -85,6 +75,8 @@ public class SessionDto
     public string? Notes { get; set; }
     public bool IsActive { get; set; }
     public Guid OwnerTrainerId { get; set; }
+    /// <summary>DisplayName of the trainer who owns this session.</summary>
+    public string? OwnerDisplayName { get; set; }
     public List<ScheduleSlotDto> Schedule { get; set; } = new();
     public List<Guid> MemberIds { get; set; } = new();
     public DateTimeOffset CreatedAt { get; set; }

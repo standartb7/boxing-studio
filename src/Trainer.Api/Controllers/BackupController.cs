@@ -45,7 +45,7 @@ public class BackupController : ControllerBase
             Clients = clients.Select(c => new ClientBackup
             {
                 Id = c.Id, Name = c.Name, Phone = c.Phone, Notes = c.Notes,
-                IsActive = c.IsActive, OwnerTrainerId = c.OwnerTrainerId,
+                IsActive = c.IsActive,
             }).ToList(),
             Sessions = sessions.Select(s => new SessionBackup
             {
@@ -85,7 +85,7 @@ public class BackupController : ControllerBase
             _db.Clients.Add(new Client
             {
                 Id = c.Id, Name = c.Name, Phone = c.Phone, Notes = c.Notes,
-                IsActive = c.IsActive, OwnerTrainerId = Resolve(c.OwnerTrainerId),
+                IsActive = c.IsActive,
             });
 
         await _db.SaveChangesAsync(ct);
@@ -142,7 +142,6 @@ public class BackupController : ControllerBase
         public string? Phone { get; set; }
         public string? Notes { get; set; }
         public bool IsActive { get; set; }
-        public Guid OwnerTrainerId { get; set; }
     }
 
     public class SessionBackup

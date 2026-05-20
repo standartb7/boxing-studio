@@ -45,18 +45,34 @@ public class SessionsController : ControllerBase
             q = q.Where(s => s.OwnerTrainerId == owner);
         }
 
-        var list = await q.OrderBy(s => s.Title).ToListAsync(ct);
-        return Ok(list.Select(s => s.ToDto()).ToList());
+        // LEFT JOIN on User so each session row carries the trainer's display name.
+        // Ordering: by trainer name (so all sessions of one trainer cluster together),
+        // then by title within the trainer.
+        var rows = await (
+            from s in q
+            join u in _db.Users on s.OwnerTrainerId equals u.Id into us
+            from u in us.DefaultIfEmpty()
+            orderby u != null ? u.DisplayName : string.Empty, s.Title
+            select new { Session = s, OwnerName = u != null ? u.DisplayName : null }
+        ).ToListAsync(ct);
+
+        return Ok(rows.Select(r => r.Session.ToDto(r.OwnerName)).ToList());
     }
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<SessionDto>> GetById(Guid id, CancellationToken ct)
     {
-        var s = await Scoped().AsNoTracking()
-            .Include(x => x.Schedule)
-            .Include(x => x.Members)
-            .FirstOrDefaultAsync(x => x.Id == id, ct);
-        return s is null ? NotFound() : Ok(s.ToDto());
+        var row = await (
+            from s in Scoped().AsNoTracking()
+                .Include(x => x.Schedule)
+                .Include(x => x.Members)
+            where s.Id == id
+            join u in _db.Users on s.OwnerTrainerId equals u.Id into us
+            from u in us.DefaultIfEmpty()
+            select new { Session = s, OwnerName = u != null ? u.DisplayName : null }
+        ).FirstOrDefaultAsync(ct);
+
+        return row is null ? NotFound() : Ok(row.Session.ToDto(row.OwnerName));
     }
 
     [HttpPost]
@@ -138,10 +154,15 @@ public class SessionsController : ControllerBase
 
     private async Task<SessionDto> ReloadDto(Guid id, CancellationToken ct)
     {
-        var s = await _db.Sessions.AsNoTracking()
-            .Include(x => x.Schedule)
-            .Include(x => x.Members)
-            .FirstAsync(x => x.Id == id, ct);
-        return s.ToDto();
+        var row = await (
+            from s in _db.Sessions.AsNoTracking()
+                .Include(x => x.Schedule)
+                .Include(x => x.Members)
+            where s.Id == id
+            join u in _db.Users on s.OwnerTrainerId equals u.Id into us
+            from u in us.DefaultIfEmpty()
+            select new { Session = s, OwnerName = u != null ? u.DisplayName : null }
+        ).FirstAsync(ct);
+        return row.Session.ToDto(row.OwnerName);
     }
 }

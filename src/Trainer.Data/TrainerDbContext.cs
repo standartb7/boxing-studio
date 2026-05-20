@@ -41,7 +41,6 @@ public class TrainerDbContext : DbContext
             e.Property(x => x.Notes).HasMaxLength(2000);
             e.HasIndex(x => x.IsActive);
             e.HasIndex(x => x.Name).IsUnique();
-            e.HasIndex(x => x.OwnerTrainerId);
         });
 
         b.Entity<Session>(e =>

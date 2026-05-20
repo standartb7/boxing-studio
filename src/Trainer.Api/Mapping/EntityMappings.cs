@@ -16,15 +16,13 @@ public static class EntityMappings
         CreatedAt = u.CreatedAt,
     };
 
-    public static ClientDto ToDto(this Client c, string? ownerDisplayName = null) => new()
+    public static ClientDto ToDto(this Client c) => new()
     {
         Id = c.Id,
         Name = c.Name,
         Phone = c.Phone,
         Notes = c.Notes,
         IsActive = c.IsActive,
-        OwnerTrainerId = c.OwnerTrainerId,
-        OwnerDisplayName = ownerDisplayName,
         CreatedAt = c.CreatedAt,
         UpdatedAt = c.UpdatedAt,
     };
@@ -36,7 +34,7 @@ public static class EntityMappings
         SortOrder = t.SortOrder,
     };
 
-    public static SessionDto ToDto(this Session s) => new()
+    public static SessionDto ToDto(this Session s, string? ownerDisplayName = null) => new()
     {
         Id = s.Id,
         Title = s.Title,
@@ -44,6 +42,7 @@ public static class EntityMappings
         Notes = s.Notes,
         IsActive = s.IsActive,
         OwnerTrainerId = s.OwnerTrainerId,
+        OwnerDisplayName = ownerDisplayName,
         Schedule = s.Schedule.Select(sl => new ScheduleSlotDto { Day = sl.Day, Time = sl.Time }).ToList(),
         MemberIds = s.Members.Select(m => m.Id).ToList(),
         CreatedAt = s.CreatedAt,

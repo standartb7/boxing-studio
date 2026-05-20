@@ -1,10 +1,8 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Microsoft.Extensions.DependencyInjection;
 using Trainer.Contracts;
 using Trainer.Core.Entities;
-using Trainer.Data;
 
 namespace Trainer.Api.Tests;
 
@@ -30,83 +28,94 @@ public class RoleScopingTests : IAsyncLifetime
         _client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", TestData.IssueAccessToken(_factory, user));
 
-    [Fact]
-    public async Task Trainer_sees_only_own_clients_on_GET()
-    {
-        var trainerA = await TestData.SeedUserAsync(_factory, "a@gym.test", "pw", UserRole.Trainer, displayName: "A");
-        var trainerB = await TestData.SeedUserAsync(_factory, "b@gym.test", "pw", UserRole.Trainer, displayName: "B");
-        await TestData.SeedClientAsync(_factory, trainerA.Id, "Alice");
-        await TestData.SeedClientAsync(_factory, trainerB.Id, "Bob");
-
-        AuthAs(trainerA);
-        var resp = await _client.GetAsync("/api/clients");
-        var list = await resp.Content.ReadFromJsonAsync<List<ClientDto>>();
-        Assert.NotNull(list);
-        Assert.Single(list!);
-        Assert.Equal("Alice", list![0].Name);
-    }
+    // ---- Clients are gym-wide --------------------------------------------
 
     [Fact]
-    public async Task HeadTrainer_sees_all_clients()
+    public async Task All_trainers_see_all_clients()
     {
-        var head = await TestData.SeedUserAsync(_factory, "h@gym.test", "pw", UserRole.HeadTrainer);
-        var trainer = await TestData.SeedUserAsync(_factory, "t@gym.test", "pw", UserRole.Trainer);
-        await TestData.SeedClientAsync(_factory, head.Id, "Carol");
-        await TestData.SeedClientAsync(_factory, trainer.Id, "Dave");
+        var a = await TestData.SeedUserAsync(_factory, "a@gym.test", "pw", UserRole.Trainer);
+        await TestData.SeedUserAsync(_factory, "b@gym.test", "pw", UserRole.Trainer);
+        await TestData.SeedClientAsync(_factory, "Alice");
+        await TestData.SeedClientAsync(_factory, "Bob");
 
-        AuthAs(head);
-        var resp = await _client.GetAsync("/api/clients");
-        var list = await resp.Content.ReadFromJsonAsync<List<ClientDto>>();
+        AuthAs(a);
+        var list = await _client.GetFromJsonAsync<List<ClientDto>>("/api/clients");
         Assert.Equal(2, list!.Count);
     }
 
     [Fact]
-    public async Task Trainer_cannot_assign_client_to_another_owner_on_create()
+    public async Task Trainer_can_create_a_client()
     {
-        var trainerA = await TestData.SeedUserAsync(_factory, "a@gym.test", "pw", UserRole.Trainer);
-        var trainerB = await TestData.SeedUserAsync(_factory, "b@gym.test", "pw", UserRole.Trainer);
+        var trainer = await TestData.SeedUserAsync(_factory, "a@gym.test", "pw", UserRole.Trainer);
+        AuthAs(trainer);
 
-        AuthAs(trainerA);
         var resp = await _client.PostAsJsonAsync("/api/clients", new CreateClientRequest
         {
             Name = "Eve",
-            OwnerTrainerId = trainerB.Id, // ignored — service forces self
+            Phone = "+7 999",
         });
         Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
         var dto = await resp.Content.ReadFromJsonAsync<ClientDto>();
-        Assert.Equal(trainerA.Id, dto!.OwnerTrainerId);
+        Assert.Equal("Eve", dto!.Name);
     }
 
+    // ---- Sessions are still per-trainer ----------------------------------
+
     [Fact]
-    public async Task Trainer_cannot_reassign_clients()
+    public async Task Trainer_only_sees_own_sessions()
     {
-        var trainerA = await TestData.SeedUserAsync(_factory, "a@gym.test", "pw", UserRole.Trainer);
-        var trainerB = await TestData.SeedUserAsync(_factory, "b@gym.test", "pw", UserRole.Trainer);
-        var (_, clientId) = await TestData.SeedClientAsync(_factory, trainerA.Id, "Frank");
+        var a = await TestData.SeedUserAsync(_factory, "a@gym.test", "pw", UserRole.Trainer);
+        var b = await TestData.SeedUserAsync(_factory, "b@gym.test", "pw", UserRole.Trainer);
+        await TestData.SeedSessionAsync(_factory, a.Id, "A's morning");
+        await TestData.SeedSessionAsync(_factory, b.Id, "B's evening");
 
-        AuthAs(trainerA);
-        var resp = await _client.PostAsJsonAsync($"/api/clients/{clientId}/reassign",
-            new ReassignClientRequest { NewOwnerTrainerId = trainerB.Id });
-        Assert.Equal(HttpStatusCode.Forbidden, resp.StatusCode);
+        AuthAs(a);
+        var list = await _client.GetFromJsonAsync<List<SessionDto>>("/api/sessions");
+        Assert.Single(list!);
+        Assert.Equal("A's morning", list![0].Title);
     }
 
     [Fact]
-    public async Task HeadTrainer_can_reassign_a_client_to_another_trainer()
+    public async Task HeadTrainer_sees_all_sessions_with_owner_display_name()
+    {
+        var head = await TestData.SeedUserAsync(_factory, "h@gym.test", "pw", UserRole.HeadTrainer, displayName: "Head");
+        var trainer = await TestData.SeedUserAsync(_factory, "t@gym.test", "pw", UserRole.Trainer, displayName: "Trainer");
+        await TestData.SeedSessionAsync(_factory, head.Id, "Head session");
+        await TestData.SeedSessionAsync(_factory, trainer.Id, "Trainer session");
+
+        AuthAs(head);
+        var list = await _client.GetFromJsonAsync<List<SessionDto>>("/api/sessions");
+        Assert.Equal(2, list!.Count);
+        Assert.All(list, s => Assert.False(string.IsNullOrEmpty(s.OwnerDisplayName)));
+    }
+
+    [Fact]
+    public async Task HeadTrainer_can_filter_sessions_by_ownerTrainerId()
     {
         var head = await TestData.SeedUserAsync(_factory, "h@gym.test", "pw", UserRole.HeadTrainer);
         var trainer = await TestData.SeedUserAsync(_factory, "t@gym.test", "pw", UserRole.Trainer);
-        var (_, clientId) = await TestData.SeedClientAsync(_factory, head.Id, "Gina");
+        await TestData.SeedSessionAsync(_factory, head.Id, "Head's");
+        await TestData.SeedSessionAsync(_factory, trainer.Id, "Trainer's");
 
         AuthAs(head);
-        var resp = await _client.PostAsJsonAsync($"/api/clients/{clientId}/reassign",
-            new ReassignClientRequest { NewOwnerTrainerId = trainer.Id });
-        Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
-
-        AuthAs(trainer);
-        var list = await _client.GetFromJsonAsync<List<ClientDto>>("/api/clients");
+        var list = await _client.GetFromJsonAsync<List<SessionDto>>(
+            $"/api/sessions?ownerTrainerId={trainer.Id}");
         Assert.Single(list!);
-        Assert.Equal("Gina", list![0].Name);
+        Assert.Equal("Trainer's", list![0].Title);
     }
+
+    [Fact]
+    public async Task Trainer_cannot_filter_sessions_to_another_trainer()
+    {
+        var a = await TestData.SeedUserAsync(_factory, "a@gym.test", "pw", UserRole.Trainer);
+        var b = await TestData.SeedUserAsync(_factory, "b@gym.test", "pw", UserRole.Trainer);
+
+        AuthAs(a);
+        var resp = await _client.GetAsync($"/api/sessions?ownerTrainerId={b.Id}");
+        Assert.Equal(HttpStatusCode.Forbidden, resp.StatusCode);
+    }
+
+    // ---- User self-demotion guard (unchanged) ----------------------------
 
     [Fact]
     public async Task Last_active_head_trainer_cannot_be_demoted()

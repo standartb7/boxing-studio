@@ -127,9 +127,8 @@ public class HttpSessionService : ISessionService
         var memberIds = sessions.SelectMany(s => s.Members.Select(m => m.Id)).Distinct().ToHashSet();
         if (memberIds.Count == 0) return sessions;
 
-        // Don't apply the trainer filter here — we want client display names for *all* members
-        // of the session, even those owned by other trainers.
-        var clients = await _clients.GetAllAsync(ownerTrainerId: null, ct);
+        // Clients are gym-wide — single call returns everyone we might need to join on.
+        var clients = await _clients.GetAllAsync(ct);
         var byId = clients.Where(c => memberIds.Contains(c.Id)).ToDictionary(c => c.Id, c => c.ToEntity());
 
         foreach (var s in sessions)

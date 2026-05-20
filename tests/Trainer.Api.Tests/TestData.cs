@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Trainer.Api.Auth;
 using Trainer.Core.Entities;
@@ -29,20 +30,41 @@ public static class TestData
         return user;
     }
 
-    public static async Task<(User User, Guid Id)> SeedClientAsync(
-        TestApiFactory factory, Guid ownerTrainerId, string name)
+    public static async Task<Guid> SeedClientAsync(TestApiFactory factory, string name)
     {
         using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<TrainerDbContext>();
-        var client = new Client
+        var client = new Client { Name = name, IsActive = true };
+        db.Clients.Add(client);
+        await db.SaveChangesAsync();
+        return client.Id;
+    }
+
+    public static async Task<Guid> SeedSessionAsync(
+        TestApiFactory factory, Guid ownerTrainerId, string title)
+    {
+        using var scope = factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<TrainerDbContext>();
+
+        // Sessions need a TrainingType — reuse-or-create a generic one named after the test.
+        var type = await db.TrainingTypes.FirstOrDefaultAsync(t => t.Name == "Test type");
+        if (type is null)
         {
-            Name = name,
+            type = new TrainingType { Name = "Test type", SortOrder = 1 };
+            db.TrainingTypes.Add(type);
+            await db.SaveChangesAsync();
+        }
+
+        var session = new Session
+        {
+            Title = title,
+            TrainingTypeId = type.Id,
             OwnerTrainerId = ownerTrainerId,
             IsActive = true,
         };
-        db.Clients.Add(client);
+        db.Sessions.Add(session);
         await db.SaveChangesAsync();
-        return (null!, client.Id);
+        return session.Id;
     }
 
     public static string IssueAccessToken(TestApiFactory factory, User user)

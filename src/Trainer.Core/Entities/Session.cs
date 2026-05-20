@@ -20,6 +20,13 @@ public class Session : EntityBase
     public Guid OwnerTrainerId { get; set; }
 
     /// <summary>
+    /// Display name of the owning trainer — populated by the mobile mapper from
+    /// SessionDto. Not persisted (server keeps the join in EF).
+    /// </summary>
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public string? OwnerDisplayName { get; set; }
+
+    /// <summary>
     /// Заголовок для UI: явный Title если задан, иначе имя единственного участника,
     /// иначе fallback. Тренер не должен придумывать названия для личных тренировок.
     /// </summary>
