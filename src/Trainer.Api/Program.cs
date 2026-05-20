@@ -30,6 +30,9 @@ if (string.IsNullOrWhiteSpace(authOpts.JwtSigningKey))
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        // Don't rewrite "role"/"sub" into long Microsoft URI claim types — we read them
+        // by their short names in JwtService and authorization policies.
+        options.MapInboundClaims = false;
         var keyBytes = Convert.FromBase64String(authOpts.JwtSigningKey);
         options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
         {

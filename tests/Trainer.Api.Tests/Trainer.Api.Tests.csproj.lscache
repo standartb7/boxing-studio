@@ -55,10 +55,14 @@ TemporaryDependencyNodeTargetIdentifier=net9.0
 [sourceFiles]
 <NUGET>/microsoft.net.test.sdk/17.12.0/build/netcoreapp3.1/Microsoft.NET.Test.Sdk.Program.cs
  @folderNames=..,..,..,.nuget,packages,microsoft.net.test.sdk,17.12.0,build,netcoreapp3.1
+AuthTests.cs
 obj/Debug/net9.0/
  .NETCoreApp,Version=v9.0.AssemblyAttributes.cs
  Trainer.Api.Tests.AssemblyInfo.cs
  Trainer.Api.Tests.GlobalUsings.g.cs
+RoleScopingTests.cs
+TestApiFactory.cs
+TestData.cs
 
 [metadataReferences]
 ../../src/
@@ -374,14 +378,16 @@ obj/Debug/net9.0/
  konscious.security.cryptography.argon2/1.3.1/lib/net8.0/Konscious.Security.Cryptography.Argon2.dll
  konscious.security.cryptography.blake2/1.1.1/lib/net8.0/Konscious.Security.Cryptography.Blake2.dll
  microsoft.aspnetcore.authentication.jwtbearer/9.0.1/lib/net9.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+ microsoft.aspnetcore.mvc.testing/9.0.1/lib/net9.0/Microsoft.AspNetCore.Mvc.Testing.dll
  microsoft.aspnetcore.openapi/9.0.1/lib/net9.0/Microsoft.AspNetCore.OpenApi.dll
+ microsoft.aspnetcore.testhost/9.0.1/lib/net9.0/Microsoft.AspNetCore.TestHost.dll
  microsoft.codecoverage/17.12.0/lib/netcoreapp3.1/Microsoft.VisualStudio.CodeCoverage.Shim.dll
  microsoft.data.sqlite.core/9.0.0/lib/net8.0/Microsoft.Data.Sqlite.dll
  microsoft.entityframeworkcore.abstractions/9.0.1/lib/net8.0/Microsoft.EntityFrameworkCore.Abstractions.dll
  microsoft.entityframeworkcore.relational/9.0.1/lib/net8.0/Microsoft.EntityFrameworkCore.Relational.dll
  microsoft.entityframeworkcore.sqlite.core/9.0.0/lib/net8.0/Microsoft.EntityFrameworkCore.Sqlite.dll
  microsoft.entityframeworkcore/9.0.1/lib/net8.0/Microsoft.EntityFrameworkCore.dll
- microsoft.extensions.dependencymodel/9.0.0/lib/net9.0/Microsoft.Extensions.DependencyModel.dll
+ microsoft.extensions.dependencymodel/9.0.1/lib/net9.0/Microsoft.Extensions.DependencyModel.dll
  microsoft.identitymodel.abstractions/8.0.1/lib/net9.0/Microsoft.IdentityModel.Abstractions.dll
  microsoft.identitymodel.jsonwebtokens/8.0.1/lib/net9.0/Microsoft.IdentityModel.JsonWebTokens.dll
  microsoft.identitymodel.logging/8.0.1/lib/net9.0/Microsoft.IdentityModel.Logging.dll

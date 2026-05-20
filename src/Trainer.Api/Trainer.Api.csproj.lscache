@@ -60,7 +60,13 @@ Auth/
  PasswordHasher.cs
  RefreshTokenService.cs
  TrainerScope.cs
-Controllers/AuthController.cs
+Controllers/
+ AuthController.cs
+ BackupController.cs
+ ClientsController.cs
+ SessionsController.cs
+ TrainingTypesController.cs
+ UsersController.cs
 Data/
  DesignTimeDbContextFactory.cs
  Migrations/
