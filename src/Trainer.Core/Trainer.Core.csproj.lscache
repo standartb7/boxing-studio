@@ -61,6 +61,7 @@ Abstractions/
 Entities/
  Client.cs
  EntityBase.cs
+ RefreshToken.cs
  ScheduleSlot.cs
  Session.cs
  SessionMember.cs

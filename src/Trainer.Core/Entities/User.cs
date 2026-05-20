@@ -15,4 +15,8 @@ public class User : EntityBase
     public bool IsActive { get; set; } = true;
     public Guid? InvitedByUserId { get; set; }
     public DateTimeOffset? LastLoginAt { get; set; }
+
+    // Set when the user is invited and not yet activated. Cleared on accept-invite.
+    public string? InviteCode { get; set; }
+    public DateTimeOffset? InviteCodeExpiresAt { get; set; }
 }
