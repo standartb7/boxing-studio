@@ -59,6 +59,14 @@ public class ClientsController : ControllerBase
         return c is null ? NotFound() : Ok(c.ToDto());
     }
 
+    /// <summary>
+    /// Create-or-get-by-name. If a client with the same name (case-insensitive) already
+    /// exists in the gym, return that one with 200 OK instead of erroring — this lets
+    /// trainers 'claim' an existing client by typing the name in the '+ Новый' dialog,
+    /// even when scope hides the row from their normal list. A soft-deleted match is
+    /// reactivated. Phone/Notes from the request are ignored on match to avoid
+    /// accidentally trampling another trainer's data.
+    /// </summary>
     [HttpPost]
     public async Task<ActionResult<ClientDto>> Create(CreateClientRequest req, CancellationToken ct)
     {
@@ -66,8 +74,16 @@ public class ClientsController : ControllerBase
             return BadRequest(new { error = "Name is required." });
 
         var name = req.Name.Trim();
-        if (await _db.Clients.AnyAsync(c => c.Name == name, ct))
-            return Conflict(new { error = $"Клиент с именем «{name}» уже существует." });
+        var existing = await _db.Clients.FirstOrDefaultAsync(c => c.Name == name, ct);
+        if (existing is not null)
+        {
+            if (!existing.IsActive)
+            {
+                existing.IsActive = true;
+                await _db.SaveChangesAsync(ct);
+            }
+            return Ok(existing.ToDto());
+        }
 
         var client = new Client
         {

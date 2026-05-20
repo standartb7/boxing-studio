@@ -100,11 +100,27 @@ public partial class ClientPickerPage : ContentPage
 
         try
         {
+            var trimmedName = name.Trim();
+            var trimmedPhone = string.IsNullOrWhiteSpace(phone) ? null : phone.Trim();
             var created = await _clients.CreateAsync(new Client
             {
-                Name = name.Trim(),
-                Phone = string.IsNullOrWhiteSpace(phone) ? null : phone.Trim(),
+                Name = trimmedName,
+                Phone = trimmedPhone,
             });
+
+            // Server's create-or-get: if the name already existed elsewhere in the gym,
+            // we get the existing record back. Phone may differ — tell the trainer so they
+            // know they're attaching to an existing person, not a fresh one.
+            var sameName = string.Equals(created.Name, trimmedName, StringComparison.OrdinalIgnoreCase);
+            var phoneDiffers = !string.IsNullOrEmpty(trimmedPhone)
+                && !string.Equals(created.Phone ?? string.Empty, trimmedPhone, StringComparison.Ordinal);
+            if (sameName && phoneDiffers)
+            {
+                await DisplayAlert("Найден существующий клиент",
+                    $"«{created.Name}» уже есть в системе (телефон: {created.Phone ?? "—"}). " +
+                    "Добавляю его, твой введённый телефон не использован.", "OK");
+            }
+
             Picked?.Invoke(created);
             await Navigation.PopModalAsync();
         }

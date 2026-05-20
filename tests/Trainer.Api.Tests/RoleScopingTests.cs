@@ -1,8 +1,11 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Trainer.Contracts;
 using Trainer.Core.Entities;
+using Trainer.Data;
 
 namespace Trainer.Api.Tests;
 
@@ -84,6 +87,49 @@ public class RoleScopingTests : IAsyncLifetime
         Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
         var dto = await resp.Content.ReadFromJsonAsync<ClientDto>();
         Assert.Equal("Eve", dto!.Name);
+    }
+
+    [Fact]
+    public async Task Creating_a_client_with_existing_name_returns_the_existing_one()
+    {
+        var trainer = await TestData.SeedUserAsync(_factory, "a@gym.test", "pw", UserRole.Trainer);
+        var bobId = await TestData.SeedClientAsync(_factory, "Bob");
+
+        AuthAs(trainer);
+        var resp = await _client.PostAsJsonAsync("/api/clients", new CreateClientRequest
+        {
+            Name = "Bob",
+            Phone = "+7 111", // ignored on match
+        });
+        Assert.Equal(HttpStatusCode.OK, resp.StatusCode);  // not 201 Created
+        var dto = await resp.Content.ReadFromJsonAsync<ClientDto>();
+        Assert.Equal(bobId, dto!.Id);
+    }
+
+    [Fact]
+    public async Task Recreating_a_soft_deleted_client_reactivates_it()
+    {
+        var trainer = await TestData.SeedUserAsync(_factory, "a@gym.test", "pw", UserRole.Trainer);
+        var bobId = await TestData.SeedClientAsync(_factory, "Bob");
+
+        // Simulate a prior soft-delete.
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<TrainerDbContext>();
+            var bob = await db.Clients.FirstAsync(c => c.Id == bobId);
+            bob.IsActive = false;
+            await db.SaveChangesAsync();
+        }
+
+        AuthAs(trainer);
+        var resp = await _client.PostAsJsonAsync("/api/clients", new CreateClientRequest
+        {
+            Name = "Bob",
+        });
+        Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
+        var dto = await resp.Content.ReadFromJsonAsync<ClientDto>();
+        Assert.Equal(bobId, dto!.Id);
+        Assert.True(dto.IsActive);
     }
 
     [Fact]
