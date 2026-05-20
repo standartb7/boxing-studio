@@ -1,0 +1,33 @@
+# Render Blueprint — defines services declaratively.
+# Deploy: push to GitHub -> Render dashboard -> "New +" -> "Blueprint" -> select repo.
+# Render reads this file and proposes the services; confirm to deploy.
+#
+# Secrets (ConnectionStrings__Postgres, Auth__JwtSigningKey) have `sync: false` —
+# Render will prompt for them on first apply and never expose them in this file.
+
+services:
+  - type: web
+    name: trainer-api
+    runtime: docker
+    plan: free                 # free tier sleeps after 15 min, ~30-60s cold start
+    region: frankfurt          # match Neon region for low latency
+    dockerfilePath: ./src/Trainer.Api/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeploy: true
+    branch: feat/cloud-online   # change to main once merged
+    envVars:
+      - key: PORT                # Render reads this to know where to route traffic
+        value: "8080"
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: Auth__JwtIssuer
+        value: trainer-api
+      - key: Auth__JwtAudience
+        value: trainer-app
+      - key: Auth__JwtSigningKey
+        sync: false             # set in Render dashboard
+      - key: ConnectionStrings__Postgres
+        sync: false             # set in Render dashboard (Neon URL)
