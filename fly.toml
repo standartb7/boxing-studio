@@ -1,0 +1,44 @@
+# Fly.io configuration for Trainer.Api.
+# Initial deploy:
+#   fly launch --no-deploy --copy-config --name trainer-api
+#   fly secrets set Auth__JwtSigningKey="$(openssl rand -base64 32)"
+#   fly secrets set ConnectionStrings__Postgres="postgres://USER:PASS@HOST/DB?sslmode=require"
+#   fly deploy
+# Seed first HeadTrainer (run once after first deploy):
+#   fly ssh console -C "dotnet Trainer.Api.dll seed-head-trainer head@gym.test SOME_PASSWORD 'Head Trainer'"
+
+app = "trainer-api"
+primary_region = "fra"
+
+[build]
+  dockerfile = "src/Trainer.Api/Dockerfile"
+
+[env]
+  ASPNETCORE_URLS = "http://+:8080"
+  ASPNETCORE_ENVIRONMENT = "Production"
+  Auth__JwtIssuer = "trainer-api"
+  Auth__JwtAudience = "trainer-app"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 200
+    hard_limit = 250
+
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/health"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

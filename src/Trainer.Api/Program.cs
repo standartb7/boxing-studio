@@ -1,7 +1,19 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Trainer.Api;
 using Trainer.Api.Auth;
 using Trainer.Data;
+
+// CLI mode: seed-head-trainer <email> <password> <displayName>
+if (args.Length > 0 && args[0] == SeedHeadTrainer.Command)
+{
+    var cfg = new ConfigurationBuilder()
+        .AddJsonFile("appsettings.json", optional: true)
+        .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
+        .AddEnvironmentVariables()
+        .Build();
+    return await SeedHeadTrainer.RunAsync(args, cfg.GetConnectionString("Postgres"));
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -71,7 +83,18 @@ app.MapControllers();
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok", time = DateTimeOffset.UtcNow }));
 
+// Apply pending EF migrations on startup. Acceptable on Fly.io single-machine deploys;
+// reconsider when scaling out (each instance would race the same migration).
+// Skipped in Testing — the WebApplicationFactory swaps in SQLite-in-memory.
+if (!app.Environment.IsEnvironment("Testing"))
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<TrainerDbContext>();
+    await db.Database.MigrateAsync();
+}
+
 app.Run();
+return 0;
 
 // Marker type for WebApplicationFactory<Program> in tests.
 public partial class Program;

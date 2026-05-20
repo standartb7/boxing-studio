@@ -79,6 +79,7 @@ obj/Debug/net9.0/
  Trainer.Api.AssemblyInfo.cs
  Trainer.Api.GlobalUsings.g.cs
 Program.cs
+SeedHeadTrainer.cs
 
 [metadataReferences]
 ../
