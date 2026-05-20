@@ -26,6 +26,8 @@ public class ClientDto
     public string? Notes { get; set; }
     public bool IsActive { get; set; }
     public Guid OwnerTrainerId { get; set; }
+    /// <summary>DisplayName of the owning trainer; null if the trainer was hard-deleted.</summary>
+    public string? OwnerDisplayName { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
 }

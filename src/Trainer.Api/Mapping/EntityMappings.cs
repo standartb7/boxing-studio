@@ -16,7 +16,7 @@ public static class EntityMappings
         CreatedAt = u.CreatedAt,
     };
 
-    public static ClientDto ToDto(this Client c) => new()
+    public static ClientDto ToDto(this Client c, string? ownerDisplayName = null) => new()
     {
         Id = c.Id,
         Name = c.Name,
@@ -24,6 +24,7 @@ public static class EntityMappings
         Notes = c.Notes,
         IsActive = c.IsActive,
         OwnerTrainerId = c.OwnerTrainerId,
+        OwnerDisplayName = ownerDisplayName,
         CreatedAt = c.CreatedAt,
         UpdatedAt = c.UpdatedAt,
     };

@@ -31,19 +31,33 @@ public class ClientsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<ClientDto>>> GetAll(CancellationToken ct)
     {
-        var list = await Scoped().AsNoTracking()
-            .Where(c => c.IsActive)
-            .OrderBy(c => c.Name)
-            .Select(c => c.ToDto())
-            .ToListAsync(ct);
-        return Ok(list);
+        // Left-join on User so we can ship OwnerDisplayName alongside the Guid. EF Core
+        // translates GroupJoin + DefaultIfEmpty into a LEFT JOIN, so clients owned by a
+        // user that was later hard-deleted still show up with OwnerDisplayName = null.
+        var rows = await (
+            from c in Scoped().AsNoTracking()
+            where c.IsActive
+            join u in _db.Users on c.OwnerTrainerId equals u.Id into us
+            from u in us.DefaultIfEmpty()
+            orderby c.Name
+            select new { Client = c, OwnerName = u != null ? u.DisplayName : null }
+        ).ToListAsync(ct);
+
+        return Ok(rows.Select(r => r.Client.ToDto(r.OwnerName)).ToList());
     }
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<ClientDto>> GetById(Guid id, CancellationToken ct)
     {
-        var c = await Scoped().AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, ct);
-        return c is null ? NotFound() : Ok(c.ToDto());
+        var row = await (
+            from c in Scoped().AsNoTracking()
+            where c.Id == id
+            join u in _db.Users on c.OwnerTrainerId equals u.Id into us
+            from u in us.DefaultIfEmpty()
+            select new { Client = c, OwnerName = u != null ? u.DisplayName : null }
+        ).FirstOrDefaultAsync(ct);
+
+        return row is null ? NotFound() : Ok(row.Client.ToDto(row.OwnerName));
     }
 
     [HttpPost]
@@ -76,7 +90,10 @@ public class ClientsController : ControllerBase
         };
         _db.Clients.Add(client);
         await _db.SaveChangesAsync(ct);
-        return CreatedAtAction(nameof(GetById), new { id = client.Id }, client.ToDto());
+
+        var ownerName = await _db.Users.Where(u => u.Id == ownerId)
+            .Select(u => u.DisplayName).FirstOrDefaultAsync(ct);
+        return CreatedAtAction(nameof(GetById), new { id = client.Id }, client.ToDto(ownerName));
     }
 
     [HttpPut("{id:guid}")]
@@ -97,7 +114,10 @@ public class ClientsController : ControllerBase
         client.Notes = req.Notes;
         client.IsActive = req.IsActive;
         await _db.SaveChangesAsync(ct);
-        return Ok(client.ToDto());
+
+        var ownerName = await _db.Users.Where(u => u.Id == client.OwnerTrainerId)
+            .Select(u => u.DisplayName).FirstOrDefaultAsync(ct);
+        return Ok(client.ToDto(ownerName));
     }
 
     [HttpDelete("{id:guid}")]
@@ -131,6 +151,6 @@ public class ClientsController : ControllerBase
 
         client.OwnerTrainerId = newOwner.Id;
         await _db.SaveChangesAsync(ct);
-        return Ok(client.ToDto());
+        return Ok(client.ToDto(newOwner.DisplayName));
     }
 }

@@ -9,6 +9,17 @@ public class Client : EntityBase
 
     public Guid OwnerTrainerId { get; set; }
 
+    /// <summary>
+    /// Display name of the owning trainer — populated by the mobile mapper from
+    /// ClientDto. Not persisted in the database (server keeps the join out of EF).
+    /// </summary>
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public string? OwnerDisplayName { get; set; }
+
+    /// <summary>Set by the mobile UI when the current user is a HeadTrainer — drives the reassign swipe action visibility.</summary>
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public bool CanReassign { get; set; }
+
     public List<Session> Sessions { get; set; } = new();
 
     // Алиас для совместимости с UI-биндингами, которые могут использовать FullName.

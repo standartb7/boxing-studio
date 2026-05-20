@@ -18,6 +18,7 @@ public static class DtoMapping
         Notes = d.Notes,
         IsActive = d.IsActive,
         OwnerTrainerId = d.OwnerTrainerId,
+        OwnerDisplayName = d.OwnerDisplayName,
         CreatedAt = d.CreatedAt,
         UpdatedAt = d.UpdatedAt,
     };

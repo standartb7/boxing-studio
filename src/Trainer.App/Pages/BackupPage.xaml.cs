@@ -8,18 +8,28 @@ public partial class BackupPage : ContentPage
     private readonly IBackupService _backup;
     private readonly PinService _pin;
     private readonly BiometricService _biometric;
+    private readonly AuthService _auth;
+    private readonly IServiceProvider _services;
 
-    public BackupPage(IBackupService backup, PinService pin, BiometricService biometric)
+    public BackupPage(IBackupService backup, PinService pin, BiometricService biometric,
+        AuthService auth, IServiceProvider services)
     {
         InitializeComponent();
         _backup = backup;
         _pin = pin;
         _biometric = biometric;
+        _auth = auth;
+        _services = services;
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
+
+        // Account section: who am I + admin-only "Manage trainers" button.
+        AccountLabel.Text = _auth.CurrentUserDisplayName ?? _auth.CurrentUserEmail ?? "—";
+        AccountRoleLabel.Text = _auth.IsHeadTrainer ? "Главный тренер" : "Тренер";
+        TrainersBtn.IsVisible = _auth.IsHeadTrainer;
 
         // Показываем секцию только если на устройстве реально есть биометрия.
         if (_biometric.IsAvailable())
@@ -142,6 +152,29 @@ public partial class BackupPage : ContentPage
         finally
         {
             ImportBtn.IsEnabled = true;
+        }
+    }
+
+    private async void OnManageTrainersClicked(object? sender, EventArgs e)
+    {
+        var page = _services.GetRequiredService<TrainerManagementPage>();
+        await Navigation.PushAsync(page);
+    }
+
+    private async void OnSignOutClicked(object? sender, EventArgs e)
+    {
+        var ok = await DisplayAlert("Выйти?",
+            "PIN и Face ID на этом устройстве будут сброшены — для следующего входа понадобятся email и пароль.",
+            "Выйти", "Отмена");
+        if (!ok) return;
+
+        try { await _auth.LogoutAsync(); } catch { /* offline — wipe locally anyway */ }
+        _pin.Reset();
+
+        if (Application.Current?.Windows.Count > 0)
+        {
+            var login = _services.GetRequiredService<LoginPage>();
+            Application.Current.Windows[0].Page = login;
         }
     }
 
