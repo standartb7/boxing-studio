@@ -102,3 +102,16 @@ appsettings.*.user.json
 *.secrets.json
 .env
 .env.local
+### JetBrains Rider / IntelliJ — keep team-shared settings, ignore per-user noise
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/shelf
+.idea/**/libraries
+.idea/**/dataSources/
+.idea/**/dataSources.local.xml
+.idea/**/contentModel.xml
+.idea/httpRequests
+
+### Visual Studio language services cache (regenerated on every build)
+*.lscache
