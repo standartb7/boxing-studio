@@ -21,7 +21,7 @@ public partial class LoginPage : ContentPage
         var pwd = PasswordEntry.Text;
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(pwd))
         {
-            ShowError("Введи email и пароль.");
+            ShowError("Введи логин и пароль.");
             return;
         }
 
@@ -33,7 +33,7 @@ public partial class LoginPage : ContentPage
         }
         catch (ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
         {
-            ShowError("Неверный email или пароль.");
+            ShowError("Неверный логин или пароль.");
         }
         catch (Exception ex)
         {
