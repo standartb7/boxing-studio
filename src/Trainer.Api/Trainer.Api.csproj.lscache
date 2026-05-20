@@ -55,10 +55,19 @@ TemporaryDependencyNodeTargetIdentifier=net9.0
 [sourceFiles]
 Auth/
  AuthOptions.cs
+ InviteCodeGenerator.cs
  JwtService.cs
  PasswordHasher.cs
  RefreshTokenService.cs
  TrainerScope.cs
+Controllers/AuthController.cs
+Data/
+ DesignTimeDbContextFactory.cs
+ Migrations/
+  20260520083935_Initial.cs
+  20260520083935_Initial.Designer.cs
+  TrainerDbContextModelSnapshot.cs
+Mapping/EntityMappings.cs
 obj/Debug/net9.0/
  .NETCoreApp,Version=v9.0.AssemblyAttributes.cs
  Trainer.Api.AssemblyInfo.cs
@@ -425,6 +434,9 @@ Program.cs
 <DOTNET>/sdk/9.0.102/Sdks/Microsoft.NET.Sdk/analyzers/
  Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll
  Microsoft.CodeAnalysis.NetAnalyzers.dll
+<NUGET>/microsoft.codeanalysis.analyzers/3.3.4/analyzers/dotnet/cs/
+ Microsoft.CodeAnalysis.Analyzers.dll
+ Microsoft.CodeAnalysis.CSharp.Analyzers.dll
 <NUGET>/microsoft.entityframeworkcore.analyzers/9.0.1/analyzers/dotnet/cs/Microsoft.EntityFrameworkCore.Analyzers.dll
 
 [analyzerConfigFiles]
