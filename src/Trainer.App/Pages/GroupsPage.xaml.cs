@@ -1,5 +1,7 @@
 using Trainer.App.Api;
+using Trainer.App.Common;
 using Trainer.App.Services;
+using Trainer.App.State;
 using Trainer.App.ViewModels;
 using Trainer.Contracts;
 

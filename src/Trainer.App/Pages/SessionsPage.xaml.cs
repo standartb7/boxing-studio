@@ -1,3 +1,4 @@
+using Trainer.App.Common;
 using Trainer.App.Services;
 using Trainer.App.ViewModels;
 using Trainer.Core.Entities;

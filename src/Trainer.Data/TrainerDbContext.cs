@@ -51,6 +51,10 @@ public class TrainerDbContext : DbContext
             e.HasIndex(x => x.IsActive);
             e.HasIndex(x => x.OwnerTrainerId);
 
+            // OwnerDisplayName is a transport-only field — populated by mobile mapping
+            // from SessionDto. Server reconstructs it via LEFT JOIN at query time.
+            e.Ignore(x => x.OwnerDisplayName);
+
             e.HasOne(x => x.TrainingType)
                 .WithMany()
                 .HasForeignKey(x => x.TrainingTypeId)

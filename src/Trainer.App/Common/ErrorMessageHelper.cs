@@ -1,8 +1,7 @@
-using System.Net;
 using System.Net.Http;
 using Refit;
 
-namespace Trainer.App.Services;
+namespace Trainer.App.Common;
 
 /// <summary>
 /// Turns wire-level exceptions into messages that make sense to a non-technical trainer.

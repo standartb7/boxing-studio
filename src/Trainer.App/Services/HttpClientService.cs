@@ -1,4 +1,5 @@
 using Trainer.App.Api;
+using Trainer.App.State;
 using Trainer.Contracts;
 using Trainer.Core.Abstractions;
 using Trainer.Core.Entities;

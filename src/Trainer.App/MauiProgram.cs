@@ -4,6 +4,7 @@ using Refit;
 using Trainer.App.Api;
 using Trainer.App.Pages;
 using Trainer.App.Services;
+using Trainer.App.State;
 using Trainer.App.ViewModels;
 using Trainer.Core.Abstractions;
 

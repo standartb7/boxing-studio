@@ -1,4 +1,5 @@
 using Trainer.App.Services;
+using Trainer.App.State;
 using Trainer.Core.Abstractions;
 
 namespace Trainer.App.Pages;

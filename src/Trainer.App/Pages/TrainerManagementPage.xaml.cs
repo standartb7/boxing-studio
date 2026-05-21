@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using Trainer.App.Api;
+using Trainer.App.Common;
 using Trainer.App.Services;
 using Trainer.Contracts;
 

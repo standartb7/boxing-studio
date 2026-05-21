@@ -1,4 +1,4 @@
-namespace Trainer.App.Services;
+namespace Trainer.App.State;
 
 /// <summary>
 /// Singleton state holding the "filter to this trainer" selection. Only meaningful for

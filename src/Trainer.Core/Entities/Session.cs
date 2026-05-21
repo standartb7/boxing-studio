@@ -21,9 +21,8 @@ public class Session : EntityBase
 
     /// <summary>
     /// Display name of the owning trainer — populated by the mobile mapper from
-    /// SessionDto. Not persisted (server keeps the join in EF).
+    /// SessionDto. Not persisted (TrainerDbContext explicitly ignores this column).
     /// </summary>
-    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
     public string? OwnerDisplayName { get; set; }
 
     /// <summary>
