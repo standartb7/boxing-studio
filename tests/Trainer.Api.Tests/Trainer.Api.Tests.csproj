@@ -23,7 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Trainer.Api\Trainer.Api.csproj" />
     <ProjectReference Include="..\..\src\Trainer.Contracts\Trainer.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\Trainer.Data\Trainer.Data.csproj" />
+    <ProjectReference Include="..\..\src\Trainer.Infrastructure\Trainer.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Trainer.Core\Trainer.Core.csproj" />
   </ItemGroup>
 

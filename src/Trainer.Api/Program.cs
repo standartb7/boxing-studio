@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Trainer.Api;
 using Trainer.Api.Auth;
-using Trainer.Data;
+using Trainer.Infrastructure;
 
 // CLI mode: seed-head-trainer <email> <password> <displayName>
 if (args.Length > 0 && args[0] == SeedHeadTrainer.Command)

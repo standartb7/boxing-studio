@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Trainer.Core.Entities;
-using Trainer.Data;
+using Trainer.Infrastructure;
 
 namespace Trainer.Api.Auth;
 

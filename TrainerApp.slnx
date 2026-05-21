@@ -1,7 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Trainer.Core/Trainer.Core.csproj" />
-    <Project Path="src/Trainer.Data/Trainer.Data.csproj" />
+    <Project Path="src/Trainer.Infrastructure/Trainer.Infrastructure.csproj" />
     <Project Path="src/Trainer.App/Trainer.App.csproj" />
     <Project Path="src/Trainer.Contracts/Trainer.Contracts.csproj" />
     <Project Path="src/Trainer.Api/Trainer.Api.csproj" />

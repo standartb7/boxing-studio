@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Trainer.Core.Entities;
 
-namespace Trainer.Data;
+namespace Trainer.Infrastructure;
 
 public class TrainerDbContext : DbContext
 {

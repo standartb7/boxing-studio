@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Trainer.Core\Trainer.Core.csproj" />
-    <ProjectReference Include="..\Trainer.Data\Trainer.Data.csproj" />
+    <ProjectReference Include="..\Trainer.Infrastructure\Trainer.Infrastructure.csproj" />
     <ProjectReference Include="..\Trainer.Contracts\Trainer.Contracts.csproj" />
   </ItemGroup>
 

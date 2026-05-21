@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Trainer.Contracts;
 using Trainer.Core.Entities;
-using Trainer.Data;
+using Trainer.Infrastructure;
 
 namespace Trainer.Api.Tests;
 

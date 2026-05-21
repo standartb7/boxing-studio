@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Trainer.Data;
+using Trainer.Infrastructure;
 
 namespace Trainer.Api.Data;
 

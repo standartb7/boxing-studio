@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Trainer.Api.Auth;
 using Trainer.Core.Entities;
-using Trainer.Data;
+using Trainer.Infrastructure;
 
 namespace Trainer.Api.Controllers;
 

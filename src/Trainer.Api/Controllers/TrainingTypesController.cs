@@ -5,7 +5,7 @@ using Trainer.Api.Auth;
 using Trainer.Api.Mapping;
 using Trainer.Contracts;
 using Trainer.Core.Entities;
-using Trainer.Data;
+using Trainer.Infrastructure;
 
 namespace Trainer.Api.Controllers;
 
