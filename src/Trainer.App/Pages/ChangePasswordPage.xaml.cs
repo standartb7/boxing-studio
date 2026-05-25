@@ -1,16 +1,17 @@
 using Refit;
-using Trainer.App.Services;
+using Trainer.App.Api;
+using Trainer.Contracts;
 
 namespace Trainer.App.Pages;
 
 public partial class ChangePasswordPage : ContentPage
 {
-    private readonly AuthService _auth;
+    private readonly IAuthMeApi _api;
 
-    public ChangePasswordPage(AuthService auth)
+    public ChangePasswordPage(IAuthMeApi api)
     {
         InitializeComponent();
-        _auth = auth;
+        _api = api;
     }
 
     private async void OnSaveClicked(object? sender, EventArgs e)
@@ -43,7 +44,11 @@ public partial class ChangePasswordPage : ContentPage
         SetBusy(true);
         try
         {
-            await _auth.ChangePasswordAsync(current, next);
+            await _api.ChangePasswordAsync(new ChangePasswordRequest
+            {
+                CurrentPassword = current,
+                NewPassword = next,
+            });
             await DisplayAlert("Готово", "Пароль обновлён.", "OK");
             await Navigation.PopAsync();
         }

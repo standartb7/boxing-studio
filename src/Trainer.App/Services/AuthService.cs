@@ -19,17 +19,12 @@ public class AuthService
     private const string DeviceIdKey = "auth_device_id";
 
     private readonly IAuthApi _api;
-    private readonly IAuthMeApi _meApi;
 
     private string? _accessToken;
     private DateTimeOffset _accessExpiresAt;
     private readonly SemaphoreSlim _refreshLock = new(1, 1);
 
-    public AuthService(IAuthApi api, IAuthMeApi meApi)
-    {
-        _api = api;
-        _meApi = meApi;
-    }
+    public AuthService(IAuthApi api) => _api = api;
 
     public bool IsLoggedIn => !string.IsNullOrEmpty(GetStoredRefreshToken());
     public string? CurrentUserEmail => Preferences.Default.Get<string?>(EmailKey, null);
@@ -106,15 +101,6 @@ public class AuthService
         {
             _refreshLock.Release();
         }
-    }
-
-    public async Task ChangePasswordAsync(string currentPassword, string newPassword, CancellationToken ct = default)
-    {
-        await _meApi.ChangePasswordAsync(new ChangePasswordRequest
-        {
-            CurrentPassword = currentPassword,
-            NewPassword = newPassword,
-        }, ct);
     }
 
     public async Task LogoutAsync(CancellationToken ct = default)
