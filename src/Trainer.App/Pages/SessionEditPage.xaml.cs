@@ -208,7 +208,7 @@ public partial class SessionEditPage : ContentPage
         }
 
         var phone = await DisplayPromptAsync("Новый участник", "Телефон (необязательно):", "Создать", "Отмена",
-            placeholder: "+7 999 000 0000", keyboard: Keyboard.Telephone);
+            placeholder: "+373 60 123 456", keyboard: Keyboard.Telephone);
         // phone == null означает отмену → создавать не будем
         if (phone is null) return null;
 
@@ -234,7 +234,7 @@ public partial class SessionEditPage : ContentPage
         }
 
         var phone = await DisplayPromptAsync("Редактировать", "Телефон:", "Сохранить", "Отмена",
-            initialValue: client.Phone ?? string.Empty, placeholder: "+7 999 000 0000", keyboard: Keyboard.Telephone);
+            initialValue: client.Phone ?? string.Empty, placeholder: "+373 60 123 456", keyboard: Keyboard.Telephone);
         if (phone is null) return false;
 
         client.Name = name.Trim();
@@ -284,6 +284,18 @@ public partial class SessionEditPage : ContentPage
             TextColor = Colors.Gray,
             VerticalOptions = LayoutOptions.Center,
         };
+        var callBtn = new Button
+        {
+            Text = "📞",
+            FontSize = 18,
+            Padding = new Thickness(10, 4),
+            MinimumHeightRequest = 32,
+            BackgroundColor = Colors.Transparent,
+            BorderWidth = 0,
+            IsVisible = !string.IsNullOrWhiteSpace(client.Phone),
+        };
+        callBtn.Clicked += (_, _) => TryDial(client.Phone);
+
         var removeBtn = new Button
         {
             Text = "✕",
@@ -314,6 +326,7 @@ public partial class SessionEditPage : ContentPage
             {
                 nameLabel.Text = client.FullName;
                 phoneLabel.Text = client.Phone ?? string.Empty;
+                callBtn.IsVisible = !string.IsNullOrWhiteSpace(client.Phone);
                 // если телефон появился/исчез — пересоберём строку, чтобы лейбл показывался/прятался
                 RebuildMembersPanel();
             }
@@ -326,13 +339,33 @@ public partial class SessionEditPage : ContentPage
             {
                 new ColumnDefinition(GridLength.Star),
                 new ColumnDefinition(GridLength.Auto),
+                new ColumnDefinition(GridLength.Auto),
             },
         };
         Grid.SetColumn(stack, 0);
-        Grid.SetColumn(removeBtn, 1);
+        Grid.SetColumn(callBtn, 1);
+        Grid.SetColumn(removeBtn, 2);
         grid.Children.Add(stack);
+        grid.Children.Add(callBtn);
         grid.Children.Add(removeBtn);
         return grid;
+    }
+
+    private async void TryDial(string? phone)
+    {
+        if (string.IsNullOrWhiteSpace(phone)) return;
+        try
+        {
+            PhoneDialer.Default.Open(phone.Trim());
+        }
+        catch (FeatureNotSupportedException)
+        {
+            await DisplayAlert("Не поддерживается", "На этом устройстве нет звонилки.", "OK");
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Ошибка", ex.Message, "OK");
+        }
     }
 
     // ---- сохранение ----

@@ -96,7 +96,7 @@ public partial class ClientPickerPage : ContentPage
         }
 
         var phone = await DisplayPromptAsync("Новый участник", "Телефон (необязательно):", "Создать", "Отмена",
-            placeholder: "+7 999 000 0000", keyboard: Keyboard.Telephone);
+            placeholder: "+373 60 123 456", keyboard: Keyboard.Telephone);
         if (phone is null) return;
 
         try
