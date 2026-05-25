@@ -66,6 +66,7 @@ public static class MauiProgram
 		AddAuthApi<ITrainingTypeApi>();
 		AddAuthApi<IUserApi>();
 		AddAuthApi<IAuthAdminApi>();
+		AddAuthApi<IAuthMeApi>();
 
 		// IClientService etc. now talk to the API. ViewModels are unchanged.
 		builder.Services.AddScoped<IClientService, HttpClientService>();
@@ -91,6 +92,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<ClientPickerPage>();
 		builder.Services.AddTransient<BackupPage>();
 		builder.Services.AddTransient<TrainerManagementPage>();
+		builder.Services.AddTransient<ChangePasswordPage>();
 
 #if DEBUG
 		builder.Logging.AddDebug();

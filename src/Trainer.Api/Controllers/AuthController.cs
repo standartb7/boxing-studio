@@ -134,6 +134,28 @@ public class AuthController : ControllerBase
         });
     }
 
+    [HttpPost("change-password")]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword(
+        ChangePasswordRequest req,
+        [FromServices] ITrainerScope scope,
+        CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(req.CurrentPassword) || string.IsNullOrWhiteSpace(req.NewPassword))
+            return BadRequest(new { error = "currentPassword and newPassword are required." });
+        if (req.NewPassword.Length < 8)
+            return BadRequest(new { error = "Новый пароль должен быть не короче 8 символов." });
+
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == scope.UserId, ct);
+        if (user is null || !user.IsActive) return Unauthorized();
+        if (!_hasher.Verify(req.CurrentPassword, user.PasswordHash))
+            return BadRequest(new { error = "Текущий пароль неверный." });
+
+        user.PasswordHash = _hasher.Hash(req.NewPassword);
+        await _db.SaveChangesAsync(ct);
+        return NoContent();
+    }
+
     [HttpPost("accept-invite")]
     public async Task<ActionResult<LoginResponse>> AcceptInvite(AcceptInviteRequest req, CancellationToken ct)
     {

@@ -8,7 +8,7 @@
              NavigationPage.BackButtonTitle="Назад">
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Бэкап" Order="Secondary" Clicked="OnBackupClicked" />
+        <ToolbarItem Text="Настройки" Order="Secondary" Clicked="OnBackupClicked" />
         <ToolbarItem Text="+ Группа" Clicked="OnAddGroupClicked" />
     </ContentPage.ToolbarItems>
 

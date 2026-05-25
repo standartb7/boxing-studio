@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Trainer.App.Pages.BackupPage"
-             Title="Бэкап"
+             Title="Настройки"
              BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}">
 
     <ScrollView>
@@ -11,11 +11,24 @@
             <VerticalStackLayout x:Name="AccountSection" Spacing="6">
                 <Label x:Name="AccountLabel" FontSize="15" FontAttributes="Bold" />
                 <Label x:Name="AccountRoleLabel" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
-                <HorizontalStackLayout Spacing="8" Margin="0,8,0,0">
+                <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="Start"
+                            Margin="0,8,0,0">
+                    <FlexLayout.Resources>
+                        <Style TargetType="Button">
+                            <Setter Property="Margin" Value="0,0,8,8" />
+                        </Style>
+                    </FlexLayout.Resources>
                     <Button x:Name="TrainersBtn"
                             Text="Управление тренерами"
                             Clicked="OnManageTrainersClicked"
                             IsVisible="False" />
+                    <Button x:Name="ChangePasswordBtn"
+                            Text="Сменить пароль"
+                            BackgroundColor="Transparent"
+                            TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}"
+                            BorderColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}"
+                            BorderWidth="1"
+                            Clicked="OnChangePasswordClicked" />
                     <Button x:Name="SignOutBtn"
                             Text="Выйти"
                             BackgroundColor="Transparent"
@@ -23,7 +36,7 @@
                             BorderColor="#D9534F"
                             BorderWidth="1"
                             Clicked="OnSignOutClicked" />
-                </HorizontalStackLayout>
+                </FlexLayout>
 
                 <BoxView HeightRequest="1"
                          Margin="0,8"

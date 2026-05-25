@@ -162,6 +162,12 @@ public partial class BackupPage : ContentPage
         await Navigation.PushAsync(page);
     }
 
+    private async void OnChangePasswordClicked(object? sender, EventArgs e)
+    {
+        var page = _services.GetRequiredService<ChangePasswordPage>();
+        await Navigation.PushAsync(page);
+    }
+
     private async void OnSignOutClicked(object? sender, EventArgs e)
     {
         var ok = await DisplayAlert("Выйти?",
