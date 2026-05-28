@@ -52,7 +52,9 @@
                 <Label Style="{StaticResource UgMono}" Text="СЕССИЯ · TRAINING SESSION" />
                 <Label x:Name="HeroDisplayLabel"
                        Style="{StaticResource UgDisplay}"
-                       FontSize="48"
+                       FontSize="36"
+                       MaxLines="2"
+                       LineBreakMode="TailTruncation"
                        Text="NEW SESSION" />
 
                 <BoxView HeightRequest="1"

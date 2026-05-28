@@ -39,7 +39,9 @@
             <Label Style="{StaticResource UgMono}" Text="ГРУППА · DIVISION" />
             <Label x:Name="HeroNameLabel"
                    Style="{StaticResource UgDisplay}"
-                   FontSize="46"
+                   FontSize="36"
+                   MaxLines="2"
+                   LineBreakMode="TailTruncation"
                    Text="—" />
         </VerticalStackLayout>
 
