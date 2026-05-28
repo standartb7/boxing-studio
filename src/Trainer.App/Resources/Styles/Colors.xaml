@@ -46,4 +46,25 @@
     <SolidColorBrush x:Key="Gray600Brush" Color="{StaticResource Gray600}"/>
     <SolidColorBrush x:Key="Gray900Brush" Color="{StaticResource Gray900}"/>
     <SolidColorBrush x:Key="Gray950Brush" Color="{StaticResource Gray950}"/>
+
+    <!-- ============================================================
+         Underground Redesign 2026 — boxing studio "paper ticket" look.
+         Use these tokens for new screens; old ones still use the Gray*
+         palette above until they're migrated.
+         ============================================================ -->
+    <Color x:Key="UgPaper">#EBE4D0</Color>           <!-- main paper background -->
+    <Color x:Key="UgPaperDeep">#DCD3BB</Color>       <!-- slightly darker stripe / pressed -->
+    <Color x:Key="UgInk">#121212</Color>             <!-- near-black for text + dark tiles -->
+    <Color x:Key="UgInkSoft">#3A3A3A</Color>         <!-- secondary text -->
+    <Color x:Key="UgInkMuted">#7B7466</Color>        <!-- tertiary / hints -->
+    <Color x:Key="UgRule">#1F1F1F</Color>            <!-- divider lines -->
+    <Color x:Key="UgBlood">#D9252C</Color>           <!-- primary accent (stamps, CTAs) -->
+    <Color x:Key="UgBloodDeep">#A81C22</Color>       <!-- pressed -->
+    <Color x:Key="UgTape">#F2DE73</Color>            <!-- highlight tape -->
+    <Color x:Key="UgHatch">#D8CFAF</Color>           <!-- hatched placeholders bg -->
+
+    <SolidColorBrush x:Key="UgPaperBrush" Color="{StaticResource UgPaper}" />
+    <SolidColorBrush x:Key="UgInkBrush" Color="{StaticResource UgInk}" />
+    <SolidColorBrush x:Key="UgBloodBrush" Color="{StaticResource UgBlood}" />
+    <SolidColorBrush x:Key="UgTapeBrush" Color="{StaticResource UgTape}" />
 </ResourceDictionary>

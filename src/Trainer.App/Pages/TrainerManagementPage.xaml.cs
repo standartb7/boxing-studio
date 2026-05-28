@@ -113,4 +113,9 @@ public partial class TrainerManagementPage : ContentPage
     }
 
     private static string FormatError(Exception ex) => ErrorMessageHelper.Format(ex);
+
+    private async void OnBackClicked(object? sender, EventArgs e)
+    {
+        await Navigation.PopAsync();
+    }
 }

@@ -4,6 +4,7 @@ using Trainer.App.Services;
 using Trainer.App.State;
 using Trainer.App.ViewModels;
 using Trainer.Contracts;
+using Trainer.Core.Abstractions;
 
 namespace Trainer.App.Pages;
 
@@ -14,12 +15,13 @@ public partial class GroupsPage : ContentPage
     private readonly AuthService _auth;
     private readonly TrainerFilterContext _filter;
     private readonly IUserApi _users;
+    private readonly IClientService _clients;
 
     private List<TrainerPickerItem> _pickerItems = new();
     private bool _suppressPickerEvent;
 
     public GroupsPage(GroupsViewModel vm, IServiceProvider services, AuthService auth,
-        TrainerFilterContext filter, IUserApi users)
+        TrainerFilterContext filter, IUserApi users, IClientService clients)
     {
         InitializeComponent();
         _vm = vm;
@@ -27,12 +29,15 @@ public partial class GroupsPage : ContentPage
         _auth = auth;
         _filter = filter;
         _users = users;
+        _clients = clients;
         GroupsList.ItemsSource = _vm.Items;
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+
+        ApplyHeroFromAuth();
 
         if (_auth.IsHeadTrainer)
         {
@@ -42,11 +47,33 @@ public partial class GroupsPage : ContentPage
         else
         {
             TrainerFilterBar.IsVisible = false;
-            // Regular trainer: clear any stale filter from a previous session-state quirk.
             _filter.Reset();
         }
 
         await ReloadAsync();
+    }
+
+    private void ApplyHeroFromAuth()
+    {
+        var displayName = _auth.CurrentUserDisplayName ?? _auth.CurrentUserEmail ?? "—";
+        var role = _auth.IsHeadTrainer ? "ГЛАВНЫЙ ТРЕНЕР" : "ТРЕНЕР";
+        var year = DateTime.Now.Year;
+
+        HeroRoleMonoLabel.Text = $"{role} · CH/{year}";
+        HeroDisplayLabel.Text = _auth.IsHeadTrainer ? "HEAD\nCOACH" : "CORNER\nMAN";
+        HeroNameLabel.Text = displayName.ToUpperInvariant();
+        HeroSubLabel.Text = _auth.IsHeadTrainer
+            ? "BOXING STUDIO · HEAD COACH"
+            : "BOXING STUDIO · CORNERMAN";
+        HeroInitialsLabel.Text = MakeInitials(displayName);
+    }
+
+    private static string MakeInitials(string name)
+    {
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 0) return "—";
+        if (parts.Length == 1) return parts[0].Length > 0 ? parts[0][..1].ToUpperInvariant() : "—";
+        return string.Concat(parts[0][..1], parts[1][..1]).ToUpperInvariant();
     }
 
     private async Task ReloadAsync()
@@ -54,12 +81,43 @@ public partial class GroupsPage : ContentPage
         try
         {
             await _vm.LoadAsync();
+            await RefreshStatsAsync();
+            UpdateGroupCountLabel();
+            UpdateLastSyncLabel();
             HideError();
         }
         catch (Exception ex)
         {
             ShowError(ErrorMessageHelper.Format(ex));
         }
+    }
+
+    private async Task RefreshStatsAsync()
+    {
+        StatGroupsLabel.Text = _vm.Items.Count.ToString("00");
+        StatSessionsLabel.Text = _vm.TotalSessionCount.ToString("00");
+
+        try
+        {
+            var allClients = await _clients.GetAllAsync();
+            StatClientsLabel.Text = allClients.Count.ToString("00");
+        }
+        catch
+        {
+            // Stats are decorative — don't blow up the page if clients can't load.
+            StatClientsLabel.Text = "—";
+        }
+    }
+
+    private void UpdateGroupCountLabel()
+    {
+        var n = _vm.Items.Count.ToString("00");
+        GroupCountLabel.Text = $"{n} / {n}";
+    }
+
+    private void UpdateLastSyncLabel()
+    {
+        LastSyncLabel.Text = $"LAST SYNC · {DateTime.Now:HH:mm}";
     }
 
     private void ShowError(string text)
@@ -107,8 +165,6 @@ public partial class GroupsPage : ContentPage
             foreach (var t in trainers)
                 _pickerItems.Add(new TrainerPickerItem(t.Id, t.DisplayName));
 
-            // First time after login: default to the current HeadTrainer (their own clients),
-            // not 'Все'. After that, respect whatever they last picked.
             if (!_filter.IsInitialized && _auth.CurrentUserId is { } selfId)
             {
                 var selfName = trainers.FirstOrDefault(t => t.Id == selfId)?.DisplayName
@@ -163,6 +219,8 @@ public partial class GroupsPage : ContentPage
         try
         {
             await _vm.AddGroupAsync(name.Trim());
+            await RefreshStatsAsync();
+            UpdateGroupCountLabel();
         }
         catch (Exception ex)
         {
@@ -190,6 +248,8 @@ public partial class GroupsPage : ContentPage
         try
         {
             await _vm.DeleteGroupAsync(row.Type.Id);
+            await RefreshStatsAsync();
+            UpdateGroupCountLabel();
         }
         catch (Exception ex)
         {

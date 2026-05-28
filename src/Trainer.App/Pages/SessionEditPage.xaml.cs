@@ -57,7 +57,8 @@ public partial class SessionEditPage : ContentPage
 
         if (_editing is null)
         {
-            Title = "Новая сессия";
+            HeroDisplayLabel.Text = "NEW SESSION";
+            HeroBadgeLabel.Text = "NEW";
             DeleteBtn.IsVisible = false;
             TitleEntry.Text = string.Empty;
             NotesEditor.Text = string.Empty;
@@ -75,7 +76,8 @@ public partial class SessionEditPage : ContentPage
             var fresh = await _sessions.GetByIdAsync(_editing.Id);
             if (fresh is not null) _editing = fresh;
 
-            Title = _editing.DisplayTitle;
+            HeroDisplayLabel.Text = _editing.DisplayTitle.ToUpperInvariant();
+            HeroBadgeLabel.Text = "EDIT";
             DeleteBtn.IsVisible = true;
             TitleEntry.Text = _editing.Title;
             NotesEditor.Text = _editing.Notes;
@@ -106,12 +108,7 @@ public partial class SessionEditPage : ContentPage
         SlotsPanel.Children.Clear();
         if (_slots.Count == 0)
         {
-            SlotsPanel.Children.Add(new Label
-            {
-                Text = "Нет слотов. Нажми «+ День».",
-                FontSize = 13,
-                TextColor = Colors.Gray,
-            });
+            SlotsPanel.Children.Add(MakeEmptyLabel("НЕТ СЛОТОВ · НАЖМИ «+ ДЕНЬ»"));
             return;
         }
 
@@ -125,6 +122,9 @@ public partial class SessionEditPage : ContentPage
         {
             ItemsSource = Enum.GetValues<DayOfWeek>().OrderBy(Client.DayOrder).Cast<object>().ToList(),
             SelectedItem = slot.Day,
+            FontFamily = "JetBrainsMonoBold",
+            FontSize = 13,
+            TextColor = Color.FromArgb("#121212"),
         };
         dayPicker.ItemDisplayBinding = new Binding(".", converter: new DayDisplayConverter());
         dayPicker.SelectedIndexChanged += (_, _) =>
@@ -137,6 +137,9 @@ public partial class SessionEditPage : ContentPage
             Time = slot.Time.ToTimeSpan(),
             Format = "HH:mm",
             WidthRequest = 100,
+            FontFamily = "JetBrainsMonoBold",
+            FontSize = 13,
+            TextColor = Color.FromArgb("#D9252C"),
         };
         timePicker.PropertyChanged += (_, args) =>
         {
@@ -147,11 +150,12 @@ public partial class SessionEditPage : ContentPage
         var removeBtn = new Button
         {
             Text = "✕",
-            FontSize = 16,
+            FontFamily = "JetBrainsMonoBold",
+            FontSize = 14,
             Padding = new Thickness(10, 4),
             MinimumHeightRequest = 32,
             BackgroundColor = Colors.Transparent,
-            TextColor = Colors.Red,
+            TextColor = Color.FromArgb("#D9252C"),
             BorderWidth = 0,
         };
         removeBtn.Clicked += (_, _) =>
@@ -169,6 +173,7 @@ public partial class SessionEditPage : ContentPage
                 new ColumnDefinition(GridLength.Auto),
             },
             ColumnSpacing = 8,
+            Padding = new Thickness(10, 4),
         };
         Grid.SetColumn(dayPicker, 0);
         Grid.SetColumn(timePicker, 1);
@@ -176,8 +181,29 @@ public partial class SessionEditPage : ContentPage
         grid.Children.Add(dayPicker);
         grid.Children.Add(timePicker);
         grid.Children.Add(removeBtn);
-        return grid;
+
+        return WrapInUgCard(grid);
     }
+
+    private static Label MakeEmptyLabel(string text) => new()
+    {
+        Text = text,
+        FontFamily = "JetBrainsMono",
+        FontSize = 10,
+        CharacterSpacing = 1.5,
+        TextColor = Color.FromArgb("#7B7466"),
+        HorizontalTextAlignment = TextAlignment.Center,
+        Padding = new Thickness(0, 12),
+    };
+
+    private static Border WrapInUgCard(View content) => new()
+    {
+        BackgroundColor = Color.FromArgb("#EBE4D0"),
+        Stroke = Color.FromArgb("#121212"),
+        StrokeThickness = 1,
+        Padding = 0,
+        Content = content,
+    };
 
     // ---- участники ----
 
@@ -256,12 +282,7 @@ public partial class SessionEditPage : ContentPage
         MembersPanel.Children.Clear();
         if (_members.Count == 0)
         {
-            MembersPanel.Children.Add(new Label
-            {
-                Text = "Нет участников. Нажми «+ Участник».",
-                FontSize = 13,
-                TextColor = Colors.Gray,
-            });
+            MembersPanel.Children.Add(MakeEmptyLabel("НЕТ УЧАСТНИКОВ · НАЖМИ «+ УЧАСТНИК»"));
             return;
         }
 
@@ -273,22 +294,27 @@ public partial class SessionEditPage : ContentPage
     {
         var nameLabel = new Label
         {
-            Text = client.FullName,
-            FontSize = 15,
+            Text = client.FullName.ToUpperInvariant(),
+            FontFamily = "BebasNeue",
+            FontSize = 18,
+            CharacterSpacing = 0.5,
+            TextColor = Color.FromArgb("#121212"),
             VerticalOptions = LayoutOptions.Center,
         };
         var phoneLabel = new Label
         {
             Text = client.Phone ?? string.Empty,
-            FontSize = 12,
-            TextColor = Colors.Gray,
+            FontFamily = "JetBrainsMono",
+            FontSize = 10,
+            CharacterSpacing = 1.0,
+            TextColor = Color.FromArgb("#D9252C"),
             VerticalOptions = LayoutOptions.Center,
         };
         var callBtn = new Button
         {
             Text = "📞",
-            FontSize = 18,
-            Padding = new Thickness(10, 4),
+            FontSize = 16,
+            Padding = new Thickness(8, 4),
             MinimumHeightRequest = 32,
             BackgroundColor = Colors.Transparent,
             BorderWidth = 0,
@@ -299,11 +325,12 @@ public partial class SessionEditPage : ContentPage
         var removeBtn = new Button
         {
             Text = "✕",
-            FontSize = 16,
-            Padding = new Thickness(10, 4),
+            FontFamily = "JetBrainsMonoBold",
+            FontSize = 14,
+            Padding = new Thickness(8, 4),
             MinimumHeightRequest = 32,
             BackgroundColor = Colors.Transparent,
-            TextColor = Colors.Red,
+            TextColor = Color.FromArgb("#D9252C"),
             BorderWidth = 0,
         };
         removeBtn.Clicked += (_, _) =>
@@ -312,22 +339,20 @@ public partial class SessionEditPage : ContentPage
             RebuildMembersPanel();
         };
 
-        var stack = new VerticalStackLayout { Spacing = 2 };
+        var stack = new VerticalStackLayout { Spacing = 2, VerticalOptions = LayoutOptions.Center };
         stack.Children.Add(nameLabel);
         if (!string.IsNullOrWhiteSpace(client.Phone))
             stack.Children.Add(phoneLabel);
 
-        // Тап по имени/телефону → редактирование клиента (имя/фамилия/телефон).
         var tap = new TapGestureRecognizer();
         tap.Tapped += async (_, _) =>
         {
             var ok = await PromptEditClientAsync(client);
             if (ok)
             {
-                nameLabel.Text = client.FullName;
+                nameLabel.Text = client.FullName.ToUpperInvariant();
                 phoneLabel.Text = client.Phone ?? string.Empty;
                 callBtn.IsVisible = !string.IsNullOrWhiteSpace(client.Phone);
-                // если телефон появился/исчез — пересоберём строку, чтобы лейбл показывался/прятался
                 RebuildMembersPanel();
             }
         };
@@ -341,6 +366,7 @@ public partial class SessionEditPage : ContentPage
                 new ColumnDefinition(GridLength.Auto),
                 new ColumnDefinition(GridLength.Auto),
             },
+            Padding = new Thickness(12, 8),
         };
         Grid.SetColumn(stack, 0);
         Grid.SetColumn(callBtn, 1);
@@ -348,7 +374,13 @@ public partial class SessionEditPage : ContentPage
         grid.Children.Add(stack);
         grid.Children.Add(callBtn);
         grid.Children.Add(removeBtn);
-        return grid;
+
+        return WrapInUgCard(grid);
+    }
+
+    private async void OnBackClicked(object? sender, EventArgs e)
+    {
+        await Navigation.PopAsync();
     }
 
     private async void TryDial(string? phone)

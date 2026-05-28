@@ -21,7 +21,7 @@ public partial class SessionsPage : ContentPage
     public void SetFilter(Guid trainingTypeId, string typeName)
     {
         _vm.FilterTypeId = trainingTypeId;
-        Title = typeName;
+        HeroNameLabel.Text = typeName.ToUpperInvariant();
     }
 
     protected override async void OnAppearing()
@@ -36,12 +36,18 @@ public partial class SessionsPage : ContentPage
         {
             await _vm.LoadAsync();
             ErrorBanner.IsVisible = false;
+            UpdateCountLabel();
         }
         catch (Exception ex)
         {
             ErrorText.Text = ErrorMessageHelper.Format(ex);
             ErrorBanner.IsVisible = true;
         }
+    }
+
+    private void UpdateCountLabel()
+    {
+        SessionCountLabel.Text = $"{_vm.Items.Count:00} ACTIVE";
     }
 
     private async void OnRetryClicked(object? sender, EventArgs e)
@@ -59,6 +65,12 @@ public partial class SessionsPage : ContentPage
     private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
     {
         _vm.SearchText = e.NewTextValue ?? string.Empty;
+        UpdateCountLabel();
+    }
+
+    private async void OnBackClicked(object? sender, EventArgs e)
+    {
+        await Navigation.PopAsync();
     }
 
     private async void OnAddClicked(object sender, EventArgs e)
@@ -93,6 +105,7 @@ public partial class SessionsPage : ContentPage
         try
         {
             await _vm.DeleteAsync(session.Id);
+            UpdateCountLabel();
         }
         catch (Exception ex)
         {

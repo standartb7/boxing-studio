@@ -97,4 +97,9 @@ public partial class ChangePasswordPage : ContentPage
         ErrorLabel.Text = text;
         ErrorLabel.IsVisible = true;
     }
+
+    private async void OnBackClicked(object? sender, EventArgs e)
+    {
+        await Navigation.PopAsync();
+    }
 }

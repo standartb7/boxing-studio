@@ -2,51 +2,105 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Trainer.App.Pages.LoginPage"
-             Title="Вход"
-             BackgroundColor="{AppThemeBinding Light=White, Dark=#1A1A1A}">
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{StaticResource UgPaper}">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="24,48,24,24" Spacing="16" MaximumWidthRequest="480" HorizontalOptions="Center">
+    <Grid RowDefinitions="Auto,*">
 
-            <Label Text="Boxing Studio by Victor Ialimov" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" HorizontalTextAlignment="Center" />
-            <Label Text="Вход для тренеров" FontSize="14" Opacity="0.7" HorizontalOptions="Center" Margin="0,0,0,16" />
+        <!-- Top dark mono strip -->
+        <Grid Grid.Row="0"
+              Padding="16,12,16,10"
+              BackgroundColor="{StaticResource UgInk}">
+            <Label FontFamily="JetBrainsMono"
+                   FontSize="9"
+                   CharacterSpacing="1.5"
+                   TextColor="{StaticResource UgPaper}"
+                   VerticalOptions="Center"
+                   Text="EST. MMXIX  •  BOXING STUDIO  •  ACCESS  •  REG. № 047" />
+        </Grid>
 
-            <Label Text="Логин" />
-            <Entry x:Name="EmailEntry"
-                   Keyboard="Email"
-                   IsTextPredictionEnabled="False" />
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="24,32,24,24"
+                                 Spacing="14"
+                                 MaximumWidthRequest="480"
+                                 HorizontalOptions="Center">
 
-            <Label Text="Пароль" Margin="0,8,0,0" />
-            <Entry x:Name="PasswordEntry"
-                   IsPassword="True"
-                   Placeholder="Пароль" />
+                <!-- Hero -->
+                <Label Style="{StaticResource UgMono}"
+                       Text="ВХОД ДЛЯ ТРЕНЕРОВ · ACCESS"
+                       Margin="0,8,0,0" />
+                <Label Style="{StaticResource UgDisplay}"
+                       FontSize="72"
+                       Margin="0,-6,0,0"
+                       Text="LOG IN" />
 
-            <Button x:Name="LoginBtn"
-                    Text="Войти"
-                    Clicked="OnLoginClicked"
-                    Margin="0,16,0,0" />
+                <BoxView HeightRequest="1"
+                         Color="{StaticResource UgInk}"
+                         Margin="0,4,0,12" />
 
-            <Label x:Name="ErrorLabel"
-                   IsVisible="False"
-                   TextColor="#D9534F"
-                   Margin="0,8,0,0"
-                   HorizontalOptions="Center" />
+                <!-- Email -->
+                <Label Style="{StaticResource UgFieldLabel}" Text="ЛОГИН · EMAIL" />
+                <Border Style="{StaticResource UgFieldBorder}">
+                    <Entry x:Name="EmailEntry"
+                           Style="{StaticResource UgEntry}"
+                           Keyboard="Email"
+                           IsTextPredictionEnabled="False"
+                           Placeholder="trainer@gym.com" />
+                </Border>
 
-            <ActivityIndicator x:Name="Spinner"
-                               IsRunning="False"
-                               IsVisible="False"
-                               HorizontalOptions="Center"
-                               Margin="0,8,0,0" />
+                <!-- Password -->
+                <Label Style="{StaticResource UgFieldLabel}"
+                       Text="ПАРОЛЬ · PASSWORD"
+                       Margin="0,6,0,0" />
+                <Border Style="{StaticResource UgFieldBorder}">
+                    <Entry x:Name="PasswordEntry"
+                           Style="{StaticResource UgEntry}"
+                           IsPassword="True"
+                           Placeholder="••••••••" />
+                </Border>
 
-            <BoxView HeightRequest="1" Color="#33888888" Margin="0,24,0,0" />
+                <Button x:Name="LoginBtn"
+                        Style="{StaticResource UgPrimaryButton}"
+                        Text="✷ ВОЙТИ В РИНГ ✷"
+                        Clicked="OnLoginClicked"
+                        Margin="0,18,0,0" />
 
-            <Button x:Name="AcceptInviteBtn"
-                    Text="У меня есть код приглашения"
-                    BackgroundColor="Transparent"
-                    TextColor="{AppThemeBinding Light=Black, Dark=White}"
-                    Clicked="OnAcceptInviteClicked" />
+                <!-- Error -->
+                <Label x:Name="ErrorLabel"
+                       IsVisible="False"
+                       FontFamily="JetBrainsMonoBold"
+                       FontSize="11"
+                       CharacterSpacing="0.8"
+                       TextColor="{StaticResource UgBlood}"
+                       Margin="0,6,0,0"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center" />
 
-        </VerticalStackLayout>
-    </ScrollView>
+                <ActivityIndicator x:Name="Spinner"
+                                   IsRunning="False"
+                                   IsVisible="False"
+                                   Color="{StaticResource UgInk}"
+                                   HorizontalOptions="Center"
+                                   Margin="0,6,0,0" />
+
+                <BoxView HeightRequest="1"
+                         Color="{StaticResource UgInk}"
+                         Opacity="0.4"
+                         Margin="0,20,0,8" />
+
+                <!-- Invite -->
+                <Label Style="{StaticResource UgMono}"
+                       Text="ПРИГЛАШЁН ГЛАВНЫМ ТРЕНЕРОМ?"
+                       HorizontalOptions="Center" />
+                <Button x:Name="AcceptInviteBtn"
+                        Style="{StaticResource UgGhostButton}"
+                        Text="→ ВВЕСТИ КОД ПРИГЛАШЕНИЯ"
+                        Clicked="OnAcceptInviteClicked"
+                        HorizontalOptions="Center" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
 
 </ContentPage>

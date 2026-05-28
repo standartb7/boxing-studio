@@ -3,114 +3,210 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:entities="clr-namespace:Trainer.Core.Entities;assembly=Trainer.Core"
              x:Class="Trainer.App.Pages.SessionsPage"
-             Title="Сессии"
-             NavigationPage.BackButtonTitle="Назад">
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{StaticResource UgPaper}">
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="12,16,12,12">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto">
 
-        <Border x:Name="ErrorBanner"
-                Grid.Row="0"
+        <!-- Row 0: dark top strip with Back -->
+        <Grid Grid.Row="0"
+              Padding="16,12,16,10"
+              ColumnDefinitions="Auto,*"
+              BackgroundColor="{StaticResource UgInk}">
+            <Button Grid.Column="0"
+                    Text="← НАЗАД"
+                    FontFamily="JetBrainsMonoBold"
+                    FontSize="9"
+                    CharacterSpacing="1.5"
+                    TextColor="{StaticResource UgPaper}"
+                    BackgroundColor="Transparent"
+                    BorderWidth="0"
+                    Padding="0,0,12,0"
+                    MinimumHeightRequest="22"
+                    Clicked="OnBackClicked" />
+            <Label Grid.Column="1"
+                   x:Name="TopStripLabel"
+                   FontFamily="JetBrainsMono"
+                   FontSize="9"
+                   CharacterSpacing="1.5"
+                   TextColor="{StaticResource UgPaper}"
+                   VerticalOptions="Center"
+                   Text="GROUP DETAIL  •  SESSIONS  •  NO. 02" />
+        </Grid>
+
+        <!-- Row 1: hero - section name -->
+        <VerticalStackLayout Grid.Row="1" Padding="20,16,20,12" Spacing="2">
+            <Label Style="{StaticResource UgMono}" Text="ГРУППА · DIVISION" />
+            <Label x:Name="HeroNameLabel"
+                   Style="{StaticResource UgDisplay}"
+                   FontSize="46"
+                   Text="—" />
+        </VerticalStackLayout>
+
+        <!-- Row 2: search -->
+        <Border Grid.Row="2"
+                Style="{StaticResource UgFieldBorder}"
+                Margin="16,0,16,8">
+            <Entry x:Name="SearchBox"
+                   Style="{StaticResource UgEntry}"
+                   Placeholder="FIND ▸ название · участник…"
+                   TextChanged="OnSearchTextChanged"
+                   ClearButtonVisibility="WhileEditing" />
+        </Border>
+
+        <!-- Row 3: error banner -->
+        <Border Grid.Row="3"
+                x:Name="ErrorBanner"
+                Margin="16,0,16,8"
                 Padding="12,8"
-                Margin="0,0,0,8"
+                BackgroundColor="{StaticResource UgBlood}"
                 StrokeThickness="0"
-                BackgroundColor="#FFE2E2"
                 IsVisible="False">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="8" />
-            </Border.StrokeShape>
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" VerticalOptions="Center">
-                <Label Grid.Column="0" x:Name="ErrorText" FontSize="13" TextColor="#8B0000" VerticalOptions="Center" />
-                <Button Grid.Column="1" Text="Повторить" FontSize="13" Padding="12,4"
-                        BackgroundColor="#8B0000" TextColor="White" Clicked="OnRetryClicked" />
+                <Label Grid.Column="0"
+                       x:Name="ErrorText"
+                       FontFamily="JetBrainsMonoBold"
+                       FontSize="11"
+                       TextColor="{StaticResource UgPaper}"
+                       VerticalOptions="Center" />
+                <Button Grid.Column="1"
+                        Text="ПОВТОР"
+                        FontFamily="JetBrainsMonoBold"
+                        FontSize="10"
+                        CharacterSpacing="1.2"
+                        Padding="10,4"
+                        MinimumHeightRequest="28"
+                        BackgroundColor="{StaticResource UgPaper}"
+                        TextColor="{StaticResource UgInk}"
+                        BorderWidth="0"
+                        CornerRadius="2"
+                        Clicked="OnRetryClicked" />
             </Grid>
         </Border>
 
-        <Entry x:Name="SearchBox"
-               Grid.Row="1"
-               Margin="0,0,0,8"
-               Placeholder="Поиск по названию или участникам"
-               TextChanged="OnSearchTextChanged"
-               ClearButtonVisibility="WhileEditing"
-               TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}"
-               PlaceholderColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+        <!-- Row 4: sessions list -->
+        <RefreshView Grid.Row="4" x:Name="Refresher" Refreshing="OnRefreshing">
+            <CollectionView x:Name="SessionsList"
+                            SelectionMode="Single"
+                            SelectionChanged="OnSessionSelected">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="0" />
+                </CollectionView.ItemsLayout>
 
-        <RefreshView Grid.Row="2" x:Name="Refresher" Refreshing="OnRefreshing">
-        <CollectionView x:Name="SessionsList"
-                        SelectionMode="Single"
-                        SelectionChanged="OnSessionSelected">
-            <CollectionView.ItemsLayout>
-                <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
-            </CollectionView.ItemsLayout>
-            <CollectionView.EmptyView>
-                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="6">
-                    <Label Text="Пока нет сессий" FontSize="18" HorizontalTextAlignment="Center" />
-                    <Label Text="Нажми «Добавить», чтобы создать первую" TextColor="Gray" HorizontalTextAlignment="Center" />
-                </VerticalStackLayout>
-            </CollectionView.EmptyView>
+                <CollectionView.Header>
+                    <Grid Padding="16,4,16,8"
+                          ColumnDefinitions="Auto,*,Auto"
+                          ColumnSpacing="10"
+                          VerticalOptions="Center">
+                        <Label Grid.Column="0"
+                               Style="{StaticResource UgSectionTitle}"
+                               FontSize="24"
+                               Text="СЕССИИ" />
+                        <BoxView Grid.Column="1"
+                                 HeightRequest="1"
+                                 Color="{StaticResource UgInk}"
+                                 VerticalOptions="Center" />
+                        <Label Grid.Column="2"
+                               x:Name="SessionCountLabel"
+                               Style="{StaticResource UgMono}"
+                               FontSize="11"
+                               VerticalOptions="Center"
+                               Text="0 ACTIVE" />
+                    </Grid>
+                </CollectionView.Header>
 
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="entities:Session">
-                    <SwipeView Margin="0,4">
-                        <SwipeView.RightItems>
-                            <SwipeItems Mode="Reveal">
-                                <SwipeItem Text="Удалить"
-                                           BackgroundColor="#D33"
-                                           Invoked="OnDeleteSessionInvoked" />
-                            </SwipeItems>
-                        </SwipeView.RightItems>
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8" Padding="24">
+                        <Label Text="ПОКА НЕТ СЕССИЙ"
+                               FontFamily="BebasNeue"
+                               FontSize="32"
+                               CharacterSpacing="1"
+                               HorizontalTextAlignment="Center"
+                               TextColor="{StaticResource UgInk}" />
+                        <Label Style="{StaticResource UgMono}"
+                               Text="НАЖМИ «+ НОВАЯ СЕССИЯ» ВНИЗУ"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
 
-                        <Border Padding="14"
-                                StrokeThickness="1"
-                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
-                                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="8" />
-                            </Border.StrokeShape>
-                            <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
-                                <VerticalStackLayout Grid.Column="0" Spacing="3">
-                                    <Label Text="{Binding DisplayTitle}"
-                                           FontAttributes="Bold"
-                                           FontSize="16"
-                                           TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
-                                    <Label Text="{Binding ScheduleDisplay}"
-                                           FontSize="13"
-                                           TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
-                                    <Label Text="{Binding OwnerDisplayName, StringFormat='тренер: {0}'}"
-                                           FontSize="11"
-                                           FontAttributes="Italic"
-                                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}">
-                                        <Label.Triggers>
-                                            <DataTrigger TargetType="Label" Binding="{Binding OwnerDisplayName}" Value="{x:Null}">
-                                                <Setter Property="IsVisible" Value="False" />
-                                            </DataTrigger>
-                                        </Label.Triggers>
-                                    </Label>
-                                </VerticalStackLayout>
-                                <Border Grid.Column="1"
-                                        Padding="10,4"
-                                        BackgroundColor="{StaticResource Accent}"
-                                        StrokeThickness="0"
-                                        VerticalOptions="Center">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="12" />
-                                    </Border.StrokeShape>
-                                    <Label Text="{Binding Members.Count}"
-                                           FontAttributes="Bold"
-                                           TextColor="{StaticResource Black}" />
-                                </Border>
-                            </Grid>
-                        </Border>
-                    </SwipeView>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="entities:Session">
+                        <SwipeView>
+                            <SwipeView.RightItems>
+                                <SwipeItems Mode="Reveal">
+                                    <SwipeItem Text="Удалить"
+                                               BackgroundColor="{StaticResource UgBlood}"
+                                               Invoked="OnDeleteSessionInvoked" />
+                                </SwipeItems>
+                            </SwipeView.RightItems>
+
+                            <Border BackgroundColor="{StaticResource UgPaper}"
+                                    Stroke="{StaticResource UgInk}"
+                                    StrokeThickness="0"
+                                    Padding="0">
+                                <Grid ColumnDefinitions="*,Auto"
+                                      Padding="16,14,16,14">
+                                    <BoxView Grid.ColumnSpan="2"
+                                             HeightRequest="1"
+                                             Color="{StaticResource UgInk}"
+                                             VerticalOptions="Start"
+                                             Margin="-16,0,-16,0"
+                                             Opacity="0.35" />
+
+                                    <VerticalStackLayout Grid.Column="0" Spacing="3" VerticalOptions="Center">
+                                        <Label Text="{Binding DisplayTitle}"
+                                               FontFamily="BebasNeue"
+                                               FontSize="18"
+                                               CharacterSpacing="0.5"
+                                               LineBreakMode="WordWrap"
+                                               TextColor="{StaticResource UgInk}" />
+                                        <Label Text="{Binding ScheduleDisplay}"
+                                               FontFamily="JetBrainsMono"
+                                               FontSize="10"
+                                               CharacterSpacing="1.0"
+                                               TextColor="{StaticResource UgBlood}" />
+                                        <Label Text="{Binding OwnerDisplayName, StringFormat='◆ {0}'}"
+                                               FontFamily="JetBrainsMono"
+                                               FontSize="9"
+                                               CharacterSpacing="1.0"
+                                               TextColor="{StaticResource UgInkMuted}">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding OwnerDisplayName}" Value="{x:Null}">
+                                                    <Setter Property="IsVisible" Value="False" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </VerticalStackLayout>
+
+                                    <HorizontalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                                        <Label Text="{Binding Members.Count, StringFormat='{0:00}'}"
+                                               FontFamily="BebasNeue"
+                                               FontSize="28"
+                                               TextColor="{StaticResource UgInk}"
+                                               VerticalOptions="Center" />
+                                        <Label Text="FIGHT."
+                                               Style="{StaticResource UgMono}"
+                                               FontSize="9"
+                                               VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </Grid>
+                            </Border>
+                        </SwipeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </RefreshView>
 
-        <Button Grid.Row="3"
-                Text="Добавить сессию"
-                Style="{StaticResource AccentButton}"
-                Clicked="OnAddClicked"
-                Margin="0,8,0,0" />
+        <!-- Row 5: bottom action bar -->
+        <Border Grid.Row="5"
+                Padding="16,10,16,16"
+                BackgroundColor="{StaticResource UgPaper}"
+                StrokeThickness="0">
+            <Button Style="{StaticResource UgPrimaryButton}"
+                    Text="+ НОВАЯ СЕССИЯ"
+                    Clicked="OnAddClicked" />
+        </Border>
+
     </Grid>
 
 </ContentPage>

@@ -22,7 +22,7 @@ public partial class PinEntryPage : ContentPage
 
         var canUseBiometric = _pin.IsBiometricEnabled && _biometric.IsAvailable();
         BiometricBtn.IsVisible = canUseBiometric;
-        BiometricBtn.Text = $"Войти через {_biometric.DisplayName()}";
+        BiometricBtn.Text = $"◆ {_biometric.DisplayName().ToUpperInvariant()}";
 
         if (canUseBiometric && !_biometricAttempted)
         {

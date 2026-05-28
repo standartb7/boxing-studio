@@ -2,62 +2,135 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Trainer.App.Pages.SessionEditPage"
-             Title="Сессия">
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{StaticResource UgPaper}">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="12">
+    <Grid RowDefinitions="Auto,*">
 
-            <Label Text="Название" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
-            <Entry x:Name="TitleEntry" Placeholder="Оставь пустым — будет имя участника" />
+        <!-- Top dark strip with back button -->
+        <Grid Grid.Row="0"
+              Padding="16,12,16,10"
+              ColumnDefinitions="Auto,*,Auto"
+              BackgroundColor="{StaticResource UgInk}">
+            <Button Grid.Column="0"
+                    Text="← ОТМЕНА"
+                    FontFamily="JetBrainsMonoBold"
+                    FontSize="9"
+                    CharacterSpacing="1.5"
+                    TextColor="{StaticResource UgPaper}"
+                    BackgroundColor="Transparent"
+                    BorderWidth="0"
+                    Padding="0,0,12,0"
+                    MinimumHeightRequest="22"
+                    Clicked="OnBackClicked" />
+            <Label Grid.Column="1"
+                   FontFamily="JetBrainsMono"
+                   FontSize="9"
+                   CharacterSpacing="1.5"
+                   TextColor="{StaticResource UgPaper}"
+                   VerticalOptions="Center"
+                   Text="SESSION FORM  •  BLANK 02-A" />
+            <Border Grid.Column="2"
+                    Padding="6,2"
+                    BackgroundColor="{StaticResource UgBlood}"
+                    Stroke="{StaticResource UgPaper}"
+                    StrokeThickness="1"
+                    VerticalOptions="Center">
+                <Label x:Name="HeroBadgeLabel"
+                       FontFamily="JetBrainsMonoBold"
+                       FontSize="8"
+                       CharacterSpacing="1"
+                       TextColor="{StaticResource UgPaper}"
+                       Text="NEW" />
+            </Border>
+        </Grid>
 
-            <Label Text="Группа" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
-            <Picker x:Name="TypePicker" ItemDisplayBinding="{Binding Name}" />
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="20,18,20,20" Spacing="12">
 
-            <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
-                <Label Grid.Column="0"
-                       Text="Расписание"
-                       FontSize="13"
-                       VerticalOptions="Center"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
-                <Button Grid.Column="1"
-                        Text="+ День"
-                        Clicked="OnAddSlotClicked"
-                        Style="{StaticResource OutlineButton}"
-                        Padding="10,4"
-                        FontSize="13"
-                        MinimumHeightRequest="32" />
-            </Grid>
-            <VerticalStackLayout x:Name="SlotsPanel" Spacing="6" />
+                <!-- Hero header -->
+                <Label Style="{StaticResource UgMono}" Text="СЕССИЯ · TRAINING SESSION" />
+                <Label x:Name="HeroDisplayLabel"
+                       Style="{StaticResource UgDisplay}"
+                       FontSize="48"
+                       Text="NEW SESSION" />
 
-            <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
-                <Label Grid.Column="0"
-                       Text="Участники"
-                       FontSize="13"
-                       VerticalOptions="Center"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
-                <Button Grid.Column="1"
-                        Text="+ Участник"
-                        Clicked="OnAddMemberClicked"
-                        Style="{StaticResource OutlineButton}"
-                        Padding="10,4"
-                        FontSize="13"
-                        MinimumHeightRequest="32" />
-            </Grid>
-            <VerticalStackLayout x:Name="MembersPanel" Spacing="6" />
+                <BoxView HeightRequest="1"
+                         Color="{StaticResource UgInk}"
+                         Margin="0,4,0,6" />
 
-            <Label Text="Заметки" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" Margin="0,8,0,0" />
-            <Editor x:Name="NotesEditor" HeightRequest="80" />
+                <!-- Title -->
+                <Label Style="{StaticResource UgFieldLabel}" Text="НАЗВАНИЕ · TITLE (НЕОБЯЗАТЕЛЬНО)" />
+                <Border Style="{StaticResource UgFieldBorder}">
+                    <Entry x:Name="TitleEntry"
+                           Style="{StaticResource UgEntry}"
+                           Placeholder="ОСТАВЬ ПУСТЫМ — БУДЕТ ИМЯ УЧАСТНИКА" />
+                </Border>
 
-            <Button Text="Сохранить"
-                    Style="{StaticResource AccentButton}"
-                    Clicked="OnSaveClicked"
-                    Margin="0,8,0,0" />
+                <!-- Group picker -->
+                <Label Style="{StaticResource UgFieldLabel}" Text="ГРУППА · DIVISION" Margin="0,6,0,0" />
+                <Border Style="{StaticResource UgFieldBorder}">
+                    <Picker x:Name="TypePicker"
+                            ItemDisplayBinding="{Binding Name}"
+                            FontFamily="JetBrainsMono"
+                            FontSize="14"
+                            TextColor="{StaticResource UgInk}" />
+                </Border>
 
-            <Button x:Name="DeleteBtn"
-                    Text="Удалить"
-                    Style="{StaticResource OutlineButton}"
-                    Clicked="OnDeleteClicked"
-                    IsVisible="False" />
-        </VerticalStackLayout>
-    </ScrollView>
+                <!-- Schedule slots section -->
+                <Grid ColumnDefinitions="*,Auto" Margin="0,12,0,4">
+                    <Label Grid.Column="0"
+                           Style="{StaticResource UgSectionTitle}"
+                           FontSize="22"
+                           Text="РАСПИСАНИЕ"
+                           VerticalOptions="Center" />
+                    <Button Grid.Column="1"
+                            Style="{StaticResource UgGhostButton}"
+                            Text="+ ДЕНЬ"
+                            Clicked="OnAddSlotClicked" />
+                </Grid>
+                <BoxView HeightRequest="1" Color="{StaticResource UgInk}" />
+                <VerticalStackLayout x:Name="SlotsPanel" Spacing="6" Margin="0,4,0,0" />
+
+                <!-- Members section -->
+                <Grid ColumnDefinitions="*,Auto" Margin="0,12,0,4">
+                    <Label Grid.Column="0"
+                           Style="{StaticResource UgSectionTitle}"
+                           FontSize="22"
+                           Text="УЧАСТНИКИ"
+                           VerticalOptions="Center" />
+                    <Button Grid.Column="1"
+                            Style="{StaticResource UgGhostButton}"
+                            Text="+ УЧАСТНИК"
+                            Clicked="OnAddMemberClicked" />
+                </Grid>
+                <BoxView HeightRequest="1" Color="{StaticResource UgInk}" />
+                <VerticalStackLayout x:Name="MembersPanel" Spacing="6" Margin="0,4,0,0" />
+
+                <!-- Notes -->
+                <Label Style="{StaticResource UgFieldLabel}" Text="ЗАМЕТКИ · NOTES" Margin="0,12,0,0" />
+                <Border Style="{StaticResource UgFieldBorder}" MinimumHeightRequest="100" Padding="12,8">
+                    <Editor x:Name="NotesEditor"
+                            Style="{StaticResource UgEditor}"
+                            HeightRequest="90"
+                            AutoSize="TextChanges" />
+                </Border>
+
+                <Button Style="{StaticResource UgPrimaryButton}"
+                        Text="✷ СОХРАНИТЬ ✷"
+                        Clicked="OnSaveClicked"
+                        Margin="0,16,0,0" />
+
+                <Button x:Name="DeleteBtn"
+                        Style="{StaticResource UgGhostButton}"
+                        Text="◆ УДАЛИТЬ СЕССИЮ"
+                        TextColor="{StaticResource UgBlood}"
+                        BorderColor="{StaticResource UgBlood}"
+                        Clicked="OnDeleteClicked"
+                        IsVisible="False"
+                        Margin="0,6,0,0" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
 </ContentPage>

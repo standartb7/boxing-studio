@@ -3,68 +3,140 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:contracts="clr-namespace:Trainer.Contracts;assembly=Trainer.Contracts"
              x:Class="Trainer.App.Pages.TrainerManagementPage"
-             Title="Тренеры"
-             BackgroundColor="{AppThemeBinding Light=White, Dark=#1A1A1A}">
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{StaticResource UgPaper}">
 
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
 
-        <Label Grid.Row="0"
-               Text="Главный тренер видит клиентов всех тренеров. Обычный тренер — только своих."
-               Padding="16,12"
-               FontSize="12"
-               TextColor="{AppThemeBinding Light=#666, Dark=#bbb}" />
+        <!-- Top dark strip with back -->
+        <Grid Grid.Row="0"
+              Padding="16,12,16,10"
+              ColumnDefinitions="Auto,*"
+              BackgroundColor="{StaticResource UgInk}">
+            <Button Grid.Column="0"
+                    Text="← НАЗАД"
+                    FontFamily="JetBrainsMonoBold"
+                    FontSize="9"
+                    CharacterSpacing="1.5"
+                    TextColor="{StaticResource UgPaper}"
+                    BackgroundColor="Transparent"
+                    BorderWidth="0"
+                    Padding="0,0,12,0"
+                    MinimumHeightRequest="22"
+                    Clicked="OnBackClicked" />
+            <Label Grid.Column="1"
+                   FontFamily="JetBrainsMono"
+                   FontSize="9"
+                   CharacterSpacing="1.5"
+                   TextColor="{StaticResource UgPaper}"
+                   VerticalOptions="Center"
+                   Text="ADMIN  •  CORNERMEN ROSTER  •  NO. 03" />
+        </Grid>
 
+        <!-- Hero + hint -->
+        <VerticalStackLayout Grid.Row="1" Padding="20,16,20,12" Spacing="4">
+            <Label Style="{StaticResource UgMono}" Text="УПРАВЛЕНИЕ КОМАНДОЙ · ADMIN" />
+            <Label Style="{StaticResource UgDisplay}"
+                   FontSize="44"
+                   Text="ТРЕНЕРЫ" />
+            <Label Style="{StaticResource UgMono}"
+                   FontSize="10"
+                   LineHeight="1.4"
+                   Margin="0,4,0,0"
+                   Text="ГЛАВНЫЙ ТРЕНЕР ВИДИТ КЛИЕНТОВ ВСЕХ ТРЕНЕРОВ. ОБЫЧНЫЙ ТРЕНЕР — ТОЛЬКО СВОИХ." />
+        </VerticalStackLayout>
+
+        <!-- Trainers list -->
         <CollectionView x:Name="UsersList"
-                        Grid.Row="1"
-                        Margin="12,0,12,12">
+                        Grid.Row="2"
+                        Margin="0,0,0,0">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="0" />
+            </CollectionView.ItemsLayout>
+
             <CollectionView.EmptyView>
-                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="6" Padding="24">
-                    <Label Text="Пока нет тренеров" FontSize="16" HorizontalTextAlignment="Center" />
+                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8" Padding="24">
+                    <Label Text="ПОКА НЕТ ТРЕНЕРОВ"
+                           FontFamily="BebasNeue"
+                           FontSize="32"
+                           CharacterSpacing="1"
+                           HorizontalTextAlignment="Center"
+                           TextColor="{StaticResource UgInk}" />
+                    <Label Style="{StaticResource UgMono}"
+                           Text="НАЖМИ «+ ПРИГЛАСИТЬ» ВНИЗУ"
+                           HorizontalTextAlignment="Center" />
                 </VerticalStackLayout>
             </CollectionView.EmptyView>
 
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="contracts:UserDto">
-                    <Border Padding="14"
-                            Margin="0,4"
-                            StrokeThickness="1"
-                            Stroke="{AppThemeBinding Light=#ddd, Dark=#444}">
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="8" />
-                        </Border.StrokeShape>
+                    <Border BackgroundColor="{StaticResource UgPaper}"
+                            StrokeThickness="0"
+                            Padding="0">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnUserTapped" />
                         </Border.GestureRecognizers>
 
-                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="8"
+                              Padding="16,14,16,14">
+                            <BoxView Grid.ColumnSpan="2"
+                                     HeightRequest="1"
+                                     Color="{StaticResource UgInk}"
+                                     VerticalOptions="Start"
+                                     Margin="-16,0,-16,0"
+                                     Opacity="0.35" />
 
-                            <VerticalStackLayout Grid.Column="0" Spacing="3">
-                                <Label Text="{Binding DisplayName}" FontAttributes="Bold" FontSize="15" />
-                                <Label Text="{Binding Email}" FontSize="12" TextColor="{AppThemeBinding Light=#666, Dark=#aaa}" />
-                                <Label Text="{Binding Role}" FontSize="11" FontAttributes="Italic" TextColor="{AppThemeBinding Light=#888, Dark=#bbb}" />
+                            <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                                <Label Text="{Binding DisplayName}"
+                                       FontFamily="BebasNeue"
+                                       FontSize="18"
+                                       CharacterSpacing="0.5"
+                                       LineBreakMode="WordWrap"
+                                       TextColor="{StaticResource UgInk}" />
+                                <Label Text="{Binding Email}"
+                                       FontFamily="JetBrainsMono"
+                                       FontSize="10"
+                                       CharacterSpacing="0.8"
+                                       TextColor="{StaticResource UgInkMuted}" />
+                                <Label Text="{Binding Role, StringFormat='◆ {0}'}"
+                                       FontFamily="JetBrainsMonoBold"
+                                       FontSize="9"
+                                       CharacterSpacing="1.2"
+                                       TextColor="{StaticResource UgBlood}" />
                             </VerticalStackLayout>
 
-                            <Label Grid.Column="1"
-                                   Text="неактивен"
-                                   FontSize="11"
-                                   VerticalOptions="Center"
-                                   TextColor="#D9534F">
-                                <Label.Triggers>
-                                    <DataTrigger TargetType="Label" Binding="{Binding IsActive}" Value="True">
+                            <Border Grid.Column="1"
+                                    Padding="6,2"
+                                    BackgroundColor="{StaticResource UgBlood}"
+                                    StrokeThickness="0"
+                                    VerticalOptions="Center">
+                                <Label Text="НЕАКТИВЕН"
+                                       FontFamily="JetBrainsMonoBold"
+                                       FontSize="9"
+                                       CharacterSpacing="1.0"
+                                       TextColor="{StaticResource UgPaper}" />
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsActive}" Value="True">
                                         <Setter Property="IsVisible" Value="False" />
                                     </DataTrigger>
-                                </Label.Triggers>
-                            </Label>
+                                </Border.Triggers>
+                            </Border>
                         </Grid>
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <Button Grid.Row="2"
-                x:Name="InviteBtn"
-                Text="+ Пригласить тренера"
-                Margin="16,8,16,16"
-                Clicked="OnInviteClicked" />
+        <!-- Bottom action bar -->
+        <Border Grid.Row="3"
+                Padding="16,10,16,16"
+                BackgroundColor="{StaticResource UgPaper}"
+                StrokeThickness="0">
+            <Button x:Name="InviteBtn"
+                    Style="{StaticResource UgPrimaryButton}"
+                    Text="+ ПРИГЛАСИТЬ ТРЕНЕРА"
+                    Clicked="OnInviteClicked" />
+        </Border>
     </Grid>
 </ContentPage>

@@ -2,47 +2,86 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Trainer.App.Pages.PinSetupPage"
-             Title="Установка PIN"
-             BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}">
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{StaticResource UgPaper}">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="24" Spacing="16" VerticalOptions="Center">
+    <Grid RowDefinitions="Auto,*">
 
-            <Image Source="logo.png"
-                   HeightRequest="140"
-                   Aspect="AspectFit"
-                   HorizontalOptions="Center" />
+        <!-- Top dark mono strip -->
+        <Grid Grid.Row="0"
+              Padding="16,12,16,10"
+              BackgroundColor="{StaticResource UgInk}">
+            <Label FontFamily="JetBrainsMono"
+                   FontSize="9"
+                   CharacterSpacing="1.5"
+                   TextColor="{StaticResource UgPaper}"
+                   VerticalOptions="Center"
+                   Text="EST. MMXIX  •  BOXING STUDIO  •  PIN SETUP  •  STEP 02" />
+        </Grid>
 
-            <Label Text="Придумай PIN-код (4 цифры)"
-                   FontSize="16"
-                   HorizontalTextAlignment="Center"
-                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="24,24,24,24"
+                                 Spacing="14"
+                                 MaximumWidthRequest="420"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="Center">
 
-            <Entry x:Name="PinEntry"
-                   Placeholder="••••"
-                   Keyboard="Numeric"
-                   MaxLength="4"
-                   IsPassword="True"
-                   HorizontalTextAlignment="Center"
-                   FontSize="22" />
+                <Label Style="{StaticResource UgMono}"
+                       Text="БЫСТРЫЙ ВХОД · QUICK ACCESS"
+                       HorizontalOptions="Center" />
+                <Label Style="{StaticResource UgDisplay}"
+                       FontSize="56"
+                       HorizontalOptions="Center"
+                       Text="SET PIN" />
+                <Label Style="{StaticResource UgMono}"
+                       Text="ПРИДУМАЙ 4 ЦИФРЫ ДЛЯ БЫСТРОГО ВХОДА"
+                       HorizontalTextAlignment="Center"
+                       HorizontalOptions="Center"
+                       Margin="0,4,0,12" />
 
-            <Entry x:Name="ConfirmEntry"
-                   Placeholder="Повтори PIN"
-                   Keyboard="Numeric"
-                   MaxLength="4"
-                   IsPassword="True"
-                   HorizontalTextAlignment="Center"
-                   FontSize="22" />
+                <Label Style="{StaticResource UgFieldLabel}" Text="PIN-КОД · 4 ЦИФРЫ" />
+                <Border Style="{StaticResource UgFieldBorder}">
+                    <Entry x:Name="PinEntry"
+                           Style="{StaticResource UgEntry}"
+                           Placeholder="• • • •"
+                           Keyboard="Numeric"
+                           MaxLength="4"
+                           IsPassword="True"
+                           HorizontalTextAlignment="Center"
+                           FontSize="22"
+                           CharacterSpacing="6" />
+                </Border>
 
-            <Label x:Name="ErrorLabel"
-                   TextColor="Red"
-                   FontSize="13"
-                   IsVisible="False" />
+                <Label Style="{StaticResource UgFieldLabel}"
+                       Text="ПОВТОРИ PIN · CONFIRM"
+                       Margin="0,6,0,0" />
+                <Border Style="{StaticResource UgFieldBorder}">
+                    <Entry x:Name="ConfirmEntry"
+                           Style="{StaticResource UgEntry}"
+                           Placeholder="• • • •"
+                           Keyboard="Numeric"
+                           MaxLength="4"
+                           IsPassword="True"
+                           HorizontalTextAlignment="Center"
+                           FontSize="22"
+                           CharacterSpacing="6" />
+                </Border>
 
-            <Button x:Name="SaveBtn"
-                    Text="Сохранить"
-                    Style="{StaticResource AccentButton}"
-                    Clicked="OnSaveClicked" />
-        </VerticalStackLayout>
-    </ScrollView>
+                <Label x:Name="ErrorLabel"
+                       FontFamily="JetBrainsMonoBold"
+                       FontSize="11"
+                       CharacterSpacing="0.8"
+                       TextColor="{StaticResource UgBlood}"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"
+                       IsVisible="False" />
+
+                <Button x:Name="SaveBtn"
+                        Style="{StaticResource UgPrimaryButton}"
+                        Text="✷ СОХРАНИТЬ PIN ✷"
+                        Clicked="OnSaveClicked"
+                        Margin="0,12,0,0" />
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 </ContentPage>

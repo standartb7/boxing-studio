@@ -25,6 +25,10 @@ public static class MauiProgram
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+				// Underground redesign: condensed display + mono labels.
+				fonts.AddFont("BebasNeue-Regular.ttf", "BebasNeue");
+				fonts.AddFont("JetBrainsMono-Regular.ttf", "JetBrainsMono");
+				fonts.AddFont("JetBrainsMono-Bold.ttf", "JetBrainsMonoBold");
 			});
 
 		// --- Auth + HTTP -----------------------------------------------------

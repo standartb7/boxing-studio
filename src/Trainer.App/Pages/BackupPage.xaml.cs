@@ -28,16 +28,18 @@ public partial class BackupPage : ContentPage
         base.OnAppearing();
 
         // Account section: who am I + admin-only "Manage trainers" button.
-        AccountLabel.Text = _auth.CurrentUserDisplayName ?? _auth.CurrentUserEmail ?? "—";
-        AccountRoleLabel.Text = _auth.IsHeadTrainer ? "Главный тренер" : "Тренер";
+        var displayName = _auth.CurrentUserDisplayName ?? _auth.CurrentUserEmail ?? "—";
+        AccountLabel.Text = displayName.ToUpperInvariant();
+        AccountRoleLabel.Text = _auth.IsHeadTrainer ? "◆ ГЛАВНЫЙ ТРЕНЕР · HEAD COACH" : "◆ ТРЕНЕР · CORNERMAN";
+        AccountInitialsLabel.Text = MakeInitials(displayName);
         TrainersBtn.IsVisible = _auth.IsHeadTrainer;
 
         // Показываем секцию только если на устройстве реально есть биометрия.
         if (_biometric.IsAvailable())
         {
             BiometricSection.IsVisible = true;
-            BiometricLabel.Text = $"{_biometric.DisplayName()} для входа";
-            BiometricHint.Text = $"Вход в приложение через {_biometric.DisplayName()}. PIN останется как запасной вариант.";
+            BiometricLabel.Text = $"{_biometric.DisplayName().ToUpperInvariant()} ДЛЯ ВХОДА";
+            BiometricHint.Text = $"ВХОД В ПРИЛОЖЕНИЕ ЧЕРЕЗ {_biometric.DisplayName().ToUpperInvariant()}. PIN ОСТАНЕТСЯ КАК ЗАПАСНОЙ ВАРИАНТ.";
             // Подписку временно отключаем чтобы программное изменение не дёрнуло Toggled.
             BiometricSwitch.Toggled -= OnBiometricToggled;
             BiometricSwitch.IsToggled = _pin.IsBiometricEnabled;
@@ -166,6 +168,19 @@ public partial class BackupPage : ContentPage
     {
         var page = _services.GetRequiredService<ChangePasswordPage>();
         await Navigation.PushAsync(page);
+    }
+
+    private async void OnBackClicked(object? sender, EventArgs e)
+    {
+        await Navigation.PopAsync();
+    }
+
+    private static string MakeInitials(string name)
+    {
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 0) return "—";
+        if (parts.Length == 1) return parts[0].Length > 0 ? parts[0][..1].ToUpperInvariant() : "—";
+        return string.Concat(parts[0][..1], parts[1][..1]).ToUpperInvariant();
     }
 
     private async void OnSignOutClicked(object? sender, EventArgs e)
