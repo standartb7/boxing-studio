@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
              x:Class="Trainer.App.Pages.SessionEditPage"
              NavigationPage.HasNavigationBar="False"
+             ios:Page.UseSafeArea="False"
              BackgroundColor="{StaticResource UgPaper}">
 
     <Grid RowDefinitions="Auto,*">
 
         <!-- Top dark strip with back button -->
         <Grid Grid.Row="0"
-              Padding="16,12,16,10"
+              Padding="{StaticResource UgTopStripPadding}"
               ColumnDefinitions="Auto,*,Auto"
               BackgroundColor="{StaticResource UgInk}">
             <Button Grid.Column="0"
@@ -46,7 +48,7 @@
         </Grid>
 
         <ScrollView Grid.Row="1">
-            <VerticalStackLayout Padding="20,18,20,20" Spacing="12">
+            <VerticalStackLayout Padding="20,18,20,40" Spacing="12">
 
                 <!-- Hero header -->
                 <Label Style="{StaticResource UgMono}" Text="СЕССИЯ · TRAINING SESSION" />

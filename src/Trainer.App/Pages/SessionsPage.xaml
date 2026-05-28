@@ -2,15 +2,17 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:entities="clr-namespace:Trainer.Core.Entities;assembly=Trainer.Core"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
              x:Class="Trainer.App.Pages.SessionsPage"
              NavigationPage.HasNavigationBar="False"
+             ios:Page.UseSafeArea="False"
              BackgroundColor="{StaticResource UgPaper}">
 
     <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto">
 
         <!-- Row 0: dark top strip with Back -->
         <Grid Grid.Row="0"
-              Padding="16,12,16,10"
+              Padding="{StaticResource UgTopStripPadding}"
               ColumnDefinitions="Auto,*"
               BackgroundColor="{StaticResource UgInk}">
             <Button Grid.Column="0"
@@ -201,7 +203,7 @@
 
         <!-- Row 5: bottom action bar -->
         <Border Grid.Row="5"
-                Padding="16,10,16,16"
+                Padding="{StaticResource UgBottomBarPadding}"
                 BackgroundColor="{StaticResource UgPaper}"
                 StrokeThickness="0">
             <Button Style="{StaticResource UgPrimaryButton}"

@@ -3,8 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Trainer.App.ViewModels"
              xmlns:entities="clr-namespace:Trainer.Core.Entities;assembly=Trainer.Core"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
              x:Class="Trainer.App.Pages.GroupsPage"
              NavigationPage.HasNavigationBar="False"
+             ios:Page.UseSafeArea="False"
              BackgroundColor="{StaticResource UgPaper}">
 
     <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
@@ -15,7 +17,7 @@
              (interactive controls inside Header glitch on iOS).
              ============================================================ -->
         <Grid Grid.Row="0"
-              Padding="16,12,16,10"
+              Padding="{StaticResource UgTopStripPadding}"
               ColumnDefinitions="*,Auto"
               BackgroundColor="{StaticResource UgInk}">
             <Label Grid.Column="0"
@@ -364,7 +366,7 @@
 
         <!-- Row 4: bottom action bar — pinned. -->
         <Border Grid.Row="4"
-                Padding="16,10,16,16"
+                Padding="{StaticResource UgBottomBarPadding}"
                 BackgroundColor="{StaticResource UgPaper}"
                 Stroke="{StaticResource UgInk}"
                 StrokeThickness="0">

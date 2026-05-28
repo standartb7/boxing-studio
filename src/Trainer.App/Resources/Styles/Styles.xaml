@@ -613,4 +613,30 @@
         <Setter Property="MinimumHeightRequest" Value="48" />
     </Style>
 
+    <!-- Padding for the dark top mono strip. iOS needs extra top to clear the status
+         bar / notch (pages opt out of safe area so the strip itself fills to the very
+         top of the screen). Other platforms don't need it. -->
+    <OnPlatform x:Key="UgTopStripPadding" x:TypeArguments="Thickness">
+        <On Platform="iOS" Value="16,54,16,10" />
+        <On Platform="MacCatalyst" Value="16,12,16,10" />
+        <On Platform="Android" Value="16,32,16,10" />
+        <On Platform="WinUI" Value="16,12,16,10" />
+    </OnPlatform>
+
+    <!-- Padding for the bottom action bar — pushes the button above the home indicator. -->
+    <OnPlatform x:Key="UgBottomBarPadding" x:TypeArguments="Thickness">
+        <On Platform="iOS" Value="16,10,16,30" />
+        <On Platform="MacCatalyst" Value="16,10,16,16" />
+        <On Platform="Android" Value="16,10,16,18" />
+        <On Platform="WinUI" Value="16,10,16,16" />
+    </OnPlatform>
+
+    <!-- Bottom padding for ScrollView content on pages without a fixed bottom bar. -->
+    <OnPlatform x:Key="UgScrollBottomPadding" x:TypeArguments="Thickness">
+        <On Platform="iOS" Value="0,0,0,30" />
+        <On Platform="MacCatalyst" Value="0,0,0,12" />
+        <On Platform="Android" Value="0,0,0,16" />
+        <On Platform="WinUI" Value="0,0,0,12" />
+    </OnPlatform>
+
 </ResourceDictionary>

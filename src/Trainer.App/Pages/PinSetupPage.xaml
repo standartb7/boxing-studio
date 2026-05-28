@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
              x:Class="Trainer.App.Pages.PinSetupPage"
              NavigationPage.HasNavigationBar="False"
+             ios:Page.UseSafeArea="False"
              BackgroundColor="{StaticResource UgPaper}">
 
     <Grid RowDefinitions="Auto,*">
 
         <!-- Top dark mono strip -->
         <Grid Grid.Row="0"
-              Padding="16,12,16,10"
+              Padding="{StaticResource UgTopStripPadding}"
               BackgroundColor="{StaticResource UgInk}">
             <Label FontFamily="JetBrainsMono"
                    FontSize="9"
@@ -20,7 +22,7 @@
         </Grid>
 
         <ScrollView Grid.Row="1">
-            <VerticalStackLayout Padding="24,24,24,24"
+            <VerticalStackLayout Padding="24,24,24,40"
                                  Spacing="14"
                                  MaximumWidthRequest="420"
                                  HorizontalOptions="Center"

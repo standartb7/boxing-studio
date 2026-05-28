@@ -2,15 +2,17 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:contracts="clr-namespace:Trainer.Contracts;assembly=Trainer.Contracts"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
              x:Class="Trainer.App.Pages.TrainerManagementPage"
              NavigationPage.HasNavigationBar="False"
+             ios:Page.UseSafeArea="False"
              BackgroundColor="{StaticResource UgPaper}">
 
     <Grid RowDefinitions="Auto,Auto,*,Auto">
 
         <!-- Top dark strip with back -->
         <Grid Grid.Row="0"
-              Padding="16,12,16,10"
+              Padding="{StaticResource UgTopStripPadding}"
               ColumnDefinitions="Auto,*"
               BackgroundColor="{StaticResource UgInk}">
             <Button Grid.Column="0"
@@ -130,7 +132,7 @@
 
         <!-- Bottom action bar -->
         <Border Grid.Row="3"
-                Padding="16,10,16,16"
+                Padding="{StaticResource UgBottomBarPadding}"
                 BackgroundColor="{StaticResource UgPaper}"
                 StrokeThickness="0">
             <Button x:Name="InviteBtn"
