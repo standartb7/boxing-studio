@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Trainer.App.ViewModels"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             x:Class="Trainer.App.Pages.AllClientsPage"
+             NavigationPage.HasNavigationBar="False"
+             ios:Page.UseSafeArea="False"
+             BackgroundColor="{StaticResource UgPaper}">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
+
+        <!-- Top dark strip with back -->
+        <Grid Grid.Row="0"
+              Padding="{StaticResource UgTopStripPadding}"
+              ColumnDefinitions="Auto,*"
+              BackgroundColor="{StaticResource UgInk}">
+            <Button Grid.Column="0"
+                    Text="← НАЗАД"
+                    FontFamily="JetBrainsMonoBold"
+                    FontSize="9"
+                    CharacterSpacing="1.5"
+                    TextColor="{StaticResource UgPaper}"
+                    BackgroundColor="Transparent"
+                    BorderWidth="0"
+                    Padding="0,0,12,0"
+                    MinimumHeightRequest="22"
+                    Clicked="OnBackClicked" />
+            <Label Grid.Column="1"
+                   FontFamily="JetBrainsMono"
+                   FontSize="9"
+                   CharacterSpacing="1.5"
+                   TextColor="{StaticResource UgPaper}"
+                   VerticalOptions="Center"
+                   Text="ADMIN  •  GYM ROSTER  •  ALL FIGHTERS" />
+        </Grid>
+
+        <!-- Hero -->
+        <VerticalStackLayout Grid.Row="1" Padding="20,16,20,8" Spacing="2">
+            <Label Style="{StaticResource UgMono}" Text="ПОЛНЫЙ СПИСОК · GYM ROSTER" />
+            <Label Style="{StaticResource UgDisplay}"
+                   FontSize="44"
+                   Text="ВСЕ КЛИЕНТЫ" />
+        </VerticalStackLayout>
+
+        <!-- Search -->
+        <Border Grid.Row="2"
+                Style="{StaticResource UgFieldBorder}"
+                Margin="16,4,16,8">
+            <Entry x:Name="SearchBox"
+                   Style="{StaticResource UgEntry}"
+                   Placeholder="FIND ▸ имя или телефон…"
+                   TextChanged="OnSearchTextChanged"
+                   ClearButtonVisibility="WhileEditing" />
+        </Border>
+
+        <!-- Section title with count -->
+        <Grid Grid.Row="3"
+              Padding="16,4,16,8"
+              ColumnDefinitions="Auto,*,Auto"
+              ColumnSpacing="10"
+              VerticalOptions="Center">
+            <Label Grid.Column="0"
+                   Style="{StaticResource UgSectionTitle}"
+                   FontSize="22"
+                   Text="РЕЕСТР" />
+            <BoxView Grid.Column="1"
+                     HeightRequest="1"
+                     Color="{StaticResource UgInk}"
+                     VerticalOptions="Center" />
+            <Label Grid.Column="2"
+                   x:Name="CountLabel"
+                   Style="{StaticResource UgMono}"
+                   FontSize="11"
+                   VerticalOptions="Center"
+                   Text="0 / 0" />
+        </Grid>
+
+        <!-- Main list. CollectionView is virtualized so 5k+ rows render fine. -->
+        <RefreshView Grid.Row="4" x:Name="Refresher" Refreshing="OnRefreshing">
+            <CollectionView x:Name="ClientsList"
+                            SelectionMode="None">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="0" />
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8" Padding="24">
+                        <Label x:Name="EmptyTitleLabel"
+                               Text="НЕТ КЛИЕНТОВ"
+                               FontFamily="BebasNeue"
+                               FontSize="32"
+                               CharacterSpacing="1"
+                               HorizontalTextAlignment="Center"
+                               TextColor="{StaticResource UgInk}" />
+                        <Label x:Name="EmptyHintLabel"
+                               Style="{StaticResource UgMono}"
+                               Text="ПОПРОБУЙ ИЗМЕНИТЬ ЗАПРОС"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ClientCard">
+                        <Border BackgroundColor="{StaticResource UgPaper}"
+                                StrokeThickness="0"
+                                Padding="0">
+                            <Grid ColumnDefinitions="*,Auto,Auto"
+                                  ColumnSpacing="8"
+                                  Padding="16,12,16,12">
+                                <BoxView Grid.ColumnSpan="3"
+                                         HeightRequest="1"
+                                         Color="{StaticResource UgInk}"
+                                         VerticalOptions="Start"
+                                         Margin="-16,0,-16,0"
+                                         Opacity="0.35" />
+
+                                <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                                    <Label Text="{Binding NameUpper}"
+                                           FontFamily="BebasNeue"
+                                           FontSize="18"
+                                           CharacterSpacing="0.5"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="1"
+                                           TextColor="{StaticResource UgInk}" />
+                                    <Label Text="{Binding MetaLine}"
+                                           FontFamily="JetBrainsMono"
+                                           FontSize="9"
+                                           CharacterSpacing="1.2"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="1"
+                                           TextColor="{StaticResource UgBlood}" />
+                                    <Label Text="{Binding Phone}"
+                                           FontFamily="JetBrainsMono"
+                                           FontSize="10"
+                                           CharacterSpacing="0.8"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="1"
+                                           TextColor="{StaticResource UgInkMuted}"
+                                           IsVisible="{Binding HasPhone}" />
+                                </VerticalStackLayout>
+
+                                <Button Grid.Column="1"
+                                        Text="📞"
+                                        FontSize="18"
+                                        Padding="8,4"
+                                        MinimumHeightRequest="36"
+                                        BackgroundColor="Transparent"
+                                        BorderWidth="0"
+                                        IsVisible="{Binding HasPhone}"
+                                        Clicked="OnCallClicked"
+                                        CommandParameter="{Binding}"
+                                        VerticalOptions="Center" />
+
+                                <HorizontalStackLayout Grid.Column="2" Spacing="4" VerticalOptions="Center">
+                                    <Label Text="{Binding CountDisplay}"
+                                           FontFamily="BebasNeue"
+                                           FontSize="22"
+                                           TextColor="{StaticResource UgInk}"
+                                           VerticalOptions="Center" />
+                                    <Label Text="SES"
+                                           Style="{StaticResource UgMono}"
+                                           FontSize="9"
+                                           VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </Grid>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnClientTapped" />
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <!-- Loading overlay -->
+        <Grid Grid.Row="4"
+              x:Name="LoadingOverlay"
+              BackgroundColor="{StaticResource UgPaper}"
+              IsVisible="False">
+            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="10">
+                <ActivityIndicator IsRunning="True" Color="{StaticResource UgInk}" />
+                <Label Style="{StaticResource UgMono}"
+                       Text="ЗАГРУЗКА…"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

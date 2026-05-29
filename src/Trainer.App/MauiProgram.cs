@@ -85,6 +85,7 @@ public static class MauiProgram
 		// ViewModels
 		builder.Services.AddTransient<GroupsViewModel>();
 		builder.Services.AddTransient<SessionsViewModel>();
+		builder.Services.AddTransient<AllClientsViewModel>();
 
 		// Pages
 		builder.Services.AddTransient<LoginPage>();
@@ -97,6 +98,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<BackupPage>();
 		builder.Services.AddTransient<TrainerManagementPage>();
 		builder.Services.AddTransient<ChangePasswordPage>();
+		builder.Services.AddTransient<AllClientsPage>();
 
 #if DEBUG
 		builder.Logging.AddDebug();

@@ -88,6 +88,10 @@
                             Text="◆ ТРЕНЕРЫ"
                             Clicked="OnManageTrainersClicked"
                             IsVisible="False" />
+                    <Button x:Name="AllClientsBtn"
+                            Text="◆ ВСЕ КЛИЕНТЫ"
+                            Clicked="OnAllClientsClicked"
+                            IsVisible="False" />
                     <Button x:Name="ChangePasswordBtn"
                             Text="◆ СМЕНИТЬ ПАРОЛЬ"
                             Clicked="OnChangePasswordClicked" />

@@ -33,6 +33,7 @@ public partial class BackupPage : ContentPage
         AccountRoleLabel.Text = _auth.IsHeadTrainer ? "◆ ГЛАВНЫЙ ТРЕНЕР · HEAD COACH" : "◆ ТРЕНЕР · CORNERMAN";
         AccountInitialsLabel.Text = MakeInitials(displayName);
         TrainersBtn.IsVisible = _auth.IsHeadTrainer;
+        AllClientsBtn.IsVisible = _auth.IsHeadTrainer;
 
         // Показываем секцию только если на устройстве реально есть биометрия.
         if (_biometric.IsAvailable())
@@ -167,6 +168,12 @@ public partial class BackupPage : ContentPage
     private async void OnChangePasswordClicked(object? sender, EventArgs e)
     {
         var page = _services.GetRequiredService<ChangePasswordPage>();
+        await Navigation.PushAsync(page);
+    }
+
+    private async void OnAllClientsClicked(object? sender, EventArgs e)
+    {
+        var page = _services.GetRequiredService<AllClientsPage>();
         await Navigation.PushAsync(page);
     }
 
