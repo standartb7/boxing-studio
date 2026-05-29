@@ -14,6 +14,24 @@ public partial class PinSetupPage : ContentPage
         _biometric = biometric;
     }
 
+    private void OnPinTextChanged(object sender, TextChangedEventArgs e)
+    {
+        // Когда ввёл 4 цифры в первом поле — автоматически прыгаем на второе.
+        if (e.NewTextValue?.Length == 4)
+            ConfirmEntry.Focus();
+    }
+
+    private void OnConfirmTextChanged(object sender, TextChangedEventArgs e)
+    {
+        // Когда ввёл 4 цифры во втором поле — убираем клавиатуру и сохраняем.
+        // (Кнопка «Сохранить» на iPhone часто закрыта клавиатурой; делаем без неё.)
+        if (e.NewTextValue?.Length == 4)
+        {
+            ConfirmEntry.Unfocus();
+            OnSaveClicked(this, EventArgs.Empty);
+        }
+    }
+
     private async void OnSaveClicked(object sender, EventArgs e)
     {
         var pin = PinEntry.Text?.Trim();

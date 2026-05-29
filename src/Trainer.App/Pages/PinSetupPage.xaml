@@ -22,11 +22,10 @@
         </Grid>
 
         <ScrollView Grid.Row="1">
-            <VerticalStackLayout Padding="24,24,24,40"
+            <VerticalStackLayout Padding="24,32,24,40"
                                  Spacing="14"
                                  MaximumWidthRequest="420"
-                                 HorizontalOptions="Center"
-                                 VerticalOptions="Center">
+                                 HorizontalOptions="Center">
 
                 <Label Style="{StaticResource UgMono}"
                        Text="БЫСТРЫЙ ВХОД · QUICK ACCESS"
@@ -51,7 +50,8 @@
                            IsPassword="True"
                            HorizontalTextAlignment="Center"
                            FontSize="22"
-                           CharacterSpacing="6" />
+                           CharacterSpacing="6"
+                           TextChanged="OnPinTextChanged" />
                 </Border>
 
                 <Label Style="{StaticResource UgFieldLabel}"
@@ -66,7 +66,8 @@
                            IsPassword="True"
                            HorizontalTextAlignment="Center"
                            FontSize="22"
-                           CharacterSpacing="6" />
+                           CharacterSpacing="6"
+                           TextChanged="OnConfirmTextChanged" />
                 </Border>
 
                 <Label x:Name="ErrorLabel"

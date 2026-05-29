@@ -90,10 +90,18 @@ public class AuthService
                 await SecureStorage.Default.SetAsync(RefreshTokenKey, pair.RefreshToken);
                 return _accessToken;
             }
+            catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                // Server explicitly rejected the refresh token (revoked / expired / replay-detected) —
+                // only in this case wipe local creds so the UI sends user back to login.
+                await LogoutLocalAsync();
+                return null;
+            }
             catch
             {
-                // Server rejected the refresh token — wipe local creds so the UI sends user to login.
-                await LogoutLocalAsync();
+                // Transient failure (no network, server down, timeout). DO NOT wipe creds —
+                // the next attempt can succeed. Caller gets a 401 for this request and surfaces
+                // an error; user can retry without re-logging in.
                 return null;
             }
         }
